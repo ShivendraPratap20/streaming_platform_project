@@ -1,3 +1,6 @@
+import { useEffect, useRef } from "react";
+import Hls from "hls.js";
+
 
 interface VidePlayerProps {
     src: string,
@@ -17,6 +20,24 @@ const VideoPlayer = ({
     loop = false,
     muted = false,
 }: VidePlayerProps) => {
+    const videoPlayerRef = useRef<HTMLMediaElement>(null);
+
+    useEffect(() => {
+        const videoPlayer = videoPlayerRef.current;
+
+        if (Hls.isSupported()) {
+            const hls = new Hls();
+
+            hls.loadSource(src);
+            hls.attachMedia(videoPlayer);
+
+            return () => hls.destroy();
+        }
+        if (videoPlayer.canPlayType("application/vnd.apple.mpegurl")) {
+            videoPlayer.src = src;
+        }
+    }, []);
+
     return (
         <video
             src={src}

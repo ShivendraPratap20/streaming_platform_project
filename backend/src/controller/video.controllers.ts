@@ -4,6 +4,7 @@ import { pipeline } from "node:stream/promises";
 import path from "node:path";
 import { Request, Response } from "express";
 import { parseRange } from "../utils/index.js";
+import { AppError } from "../utils/AppError.js";
 
 export const videoStream = async (req: Request, res: Response) => {
     try {
@@ -38,7 +39,6 @@ export const videoStream = async (req: Request, res: Response) => {
 
         const range = parseRange(rangeHeader, fileInfo.size);
 
-        // Invalid or unsatisfiable range.
         if (!range) {
             res.status(416);
             res.setHeader("Content-Range", `bytes */${fileInfo.size}`);
@@ -59,8 +59,6 @@ export const videoStream = async (req: Request, res: Response) => {
                 res
             );
         } catch (error) {
-            // A player may cancel a request when the user seeks elsewhere.
-            // Do not try to send a second response after streaming has begun.
             if (!res.destroyed) {
                 res.destroy(error as Error);
             }
