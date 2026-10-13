@@ -1,9 +1,27 @@
+import { spawn } from "node:child_process";
+
+
 type ByteRange = {
     start: number,
     end: number
 };
 
-export function parseRange(
+type VideoDataType = {
+    name: string,
+    id:number,
+    transcodingStatus: string,
+    path: string,
+    hlsPath?:string
+};
+
+const dummyVideoData: VideoDataType = {
+    name: 'cplotus3',
+    id: 12,
+    transcodingStatus: 'initial',
+    path: '/home/cvendra/Videos/cplotus3.mkv'
+}
+
+function parseRange(
     rangeHeader: string,
     fileSize: number
 ): ByteRange | null {
@@ -48,4 +66,39 @@ export function parseRange(
     }
 
     return { start, end };
+}
+
+function runFFmpeg(args: string[]) {
+    return new Promise((resolve, reject) => {
+        const process = spawn("ffmpeg", args);
+
+        let stderr = "";
+
+        process.stderr.on("data", (chunk) => {
+            stderr += chunk.toString();
+
+            // Keep the error buffer bounded.
+            if (stderr.length > 20000) {
+                stderr = stderr.slice(-20000);
+            }
+        });
+
+        process.on("error", reject);
+
+        process.on("close", (code) => {
+            if (code === 0) {
+                resolve();
+            } else {
+                reject(
+                    new Error(`FFmpeg exited with code ${code}: ${stderr}`)
+                );
+            }
+        });
+    });
+}
+
+export {
+    parseRange,
+    runFFmpeg,
+    dummyVideoData
 }

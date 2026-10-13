@@ -16,14 +16,10 @@ app.use(cors({
 
 app.use(
     "/hls",
-    express.static('/home/cvendra/hls-output/')
+    express.static('/home/cvendra/hls-output/12')
 );
 
 app.use('/api/v1', router);
-
-app.get("/", (req: Request, res: Response) => {
-    res.json({ message: "Hello" });
-})
 
 app.listen(PORT, () => {
     console.log(`Server is started at port ${PORT}`);

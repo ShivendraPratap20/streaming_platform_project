@@ -4,7 +4,7 @@ import './App.css'
 function App() {
 
   return(
-    <VideoPlayer src="http://localhost:8000/hls/index.m3u8" />
+    <VideoPlayer src="http://localhost:8000/hls/master.m3u8" />
   )
 }
 
