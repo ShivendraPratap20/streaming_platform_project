@@ -10,7 +10,7 @@ import { AppError } from "../utils/AppError.js";
 
 const HLS_ROOT = path.resolve("/home/cvendra/hls-output");
 
-export const videoStream = async (req: Request, res: Response) => {
+const videoStream = async (req: Request, res: Response) => {
     try {
         const rangeHeader = req.headers.range;
         const videoPath: string = '/home/cvendra/Downloads/RE2012.mkv';
@@ -74,7 +74,7 @@ export const videoStream = async (req: Request, res: Response) => {
 }
 
 
-export const videoTranscoding = async (req: Request, res: Response) => {
+const videoTranscoding = async (req: Request, res: Response) => {
     try {
         if (dummyVideoData.transcodingStatus === "processing") {
             return res.status(409).json({
@@ -114,7 +114,7 @@ export const videoTranscoding = async (req: Request, res: Response) => {
             "[v3]scale=w='min(640,iw)':h='min(360,ih)':force_original_aspect_ratio=decrease:force_divisible_by=2[out3]",
         ].join(";");
 
-        let hasAudio:boolean = false;
+        let hasAudio: boolean = false;
 
         const args = [
             "-hide_banner",
@@ -182,4 +182,41 @@ export const videoTranscoding = async (req: Request, res: Response) => {
             }
         })
     }
+}
+
+const videoUploading = async (req: Request, res: Response) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({
+                message: "Please upload an audio or video file.",
+            });
+        }
+
+        return res.status(201).json({
+            message: "Media uploaded successfully.",
+            file: {
+                filename: req.file.filename,
+                originalName: req.file.originalname,
+                mimetype: req.file.mimetype,
+                size: req.file.size,
+                path: req.file.path,
+            },
+        })
+    } catch (error) {
+        console.log(`VIDEO_UPLOAD_ERROR ${error}`);
+        res.status(500).json({
+            status: false,
+            message: 'Video uploading failed',
+            error: {
+                code: `[VIDEO_UPLOAD_ERROR]`,
+                details: error
+            }
+        })
+    }
+}
+
+export {
+    videoStream,
+    videoTranscoding,
+    videoUploading
 }
