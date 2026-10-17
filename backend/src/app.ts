@@ -1,6 +1,10 @@
+import * as dotenv from "dotenv";
+dotenv.config({ path: '/home/cvendra/MERN_PROJECTS/streamingPlatform/backend/.env'});
+
 import express, { Request, Response } from "express";
 import path from "node:path";
 import cors from "cors";
+import "./config/database/connection.js";
 import { router } from './routes/video.routes.js';
 
 const app = express();
@@ -10,7 +14,7 @@ const PORT: number = Number(process.env.PORT) || 8000;
 app.use(express.json());
 
 app.use(cors({
-    origin: ['http://localhost:5173', 'https://reactusermngapp.vercel.app'],
+    origin: ['http://localhost:5173'],
     credentials: true
 }));
 

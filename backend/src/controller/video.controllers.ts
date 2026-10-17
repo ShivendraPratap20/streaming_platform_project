@@ -5,8 +5,11 @@ import path from "node:path";
 import fs from "node:fs";
 import fsp from "node:fs/promises";
 import { Request, Response } from "express";
+import mongoose from "mongoose";
 import { parseRange, runFFmpeg, dummyVideoData } from "../utils/index.js";
 import { AppError } from "../utils/AppError.js";
+import { cloudinary } from "../config/cloudinary.js";
+import videoModel from "../model/database/videoModel.js";
 
 const HLS_ROOT = path.resolve("/home/cvendra/hls-output");
 
@@ -191,15 +194,55 @@ const videoUploading = async (req: Request, res: Response) => {
                 message: "Please upload an audio or video file.",
             });
         }
+        const { artistName, artistObjectID, artistUserID } = req.body;
+
+        if (!mongoose.isValidObjectId(artistObjectID)) {
+            return res.status(400).json({
+                message: "Invalid artist ObjectId",
+            });
+        }
+
+        const cloudUploadResult = await cloudinary.uploader.upload(
+            req.file.path,
+            {
+                resource_type: 'video',
+                folder: 'streaming-app/media/video'
+            }
+        );
+
+        const { originalname, size, mimetype } = req.file;
+        const { format, duration, public_id, url } = cloudUploadResult;
+
+        const videoModelResult = new videoModel({
+            videoName: originalname,
+            originalVideoName: originalname,
+            mediaType: "VIDEO",
+            artist: {
+                artistName,
+                artistObjectID: new mongoose.Types.ObjectId(artistObjectID),
+                artistUserID
+            },
+            mediaDetails: {
+                format,
+                duration,
+                size,
+                mimeType: mimetype,
+            },
+            publicID: public_id,
+            url,
+            fileStatus: "SUCCESS",
+        });
+        await videoModelResult.save();
 
         return res.status(201).json({
             message: "Media uploaded successfully.",
-            file: {
-                filename: req.file.filename,
-                originalName: req.file.originalname,
-                mimetype: req.file.mimetype,
-                size: req.file.size,
-                path: req.file.path,
+            media: {
+                publicId: cloudUploadResult.public_id,
+                url: cloudUploadResult.secure_url,
+                resourceType: cloudUploadResult.resource_type,
+                format: cloudUploadResult.format,
+                bytes: cloudUploadResult.bytes,
+                duration: cloudUploadResult.duration,
             },
         })
     } catch (error) {
