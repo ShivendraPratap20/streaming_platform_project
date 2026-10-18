@@ -6,12 +6,15 @@ import path from "node:path";
 import cors from "cors";
 import "./config/database/connection.js";
 import { router } from './routes/video.routes.js';
+import { redisConnect}  from './config/redis.config.js';
 
 const app = express();
 
 const PORT: number = Number(process.env.PORT) || 8000;
 
 app.use(express.json());
+
+redisConnect();
 
 app.use(cors({
     origin: ['http://localhost:5173'],
