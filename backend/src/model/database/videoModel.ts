@@ -81,10 +81,17 @@ const videoSchema = new mongoose.Schema(
 
     fileStatus: {
       type: String,
-      enum: ["UPLOADING", "PROCESSING", "SUCCESS", "FAILED"],
+      enum: ["UPLOADING", "UPLOADED", "QUEUED", "PROCESSING", "READY", "FAILED"],
       default: "UPLOADING",
       required: true,
     },
+    variant: [
+      { 
+        resolution: {type: Number},
+        url: { type: String },
+        publicId: { type: String },
+    }
+    ]
   },
   {
     timestamps: true,

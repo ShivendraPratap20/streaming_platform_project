@@ -10,6 +10,7 @@ import { parseRange, runFFmpeg, dummyVideoData } from "../utils/index.js";
 import { AppError } from "../utils/AppError.js";
 import { cloudinary } from "../config/cloudinary.js";
 import videoModel from "../model/database/videoModel.js";
+import { videoTranscodingQueue } from "../queues/videoTranscoding.queue.js";
 
 const HLS_ROOT = path.resolve("/home/cvendra/hls-output");
 
@@ -230,8 +231,21 @@ const videoUploading = async (req: Request, res: Response) => {
             },
             publicID: public_id,
             url,
-            fileStatus: "SUCCESS",
+            fileStatus: "UPLOADED",
         });
+        await videoModelResult.save();
+
+        const job = await videoTranscodingQueue.add(
+            "transcode-video",
+            {
+                videoId: videoModelResult._id.toString(),
+            },
+            {
+                jobId: `video-transcode-${videoModelResult._id.toString()}`,
+            }
+        );
+
+        videoModelResult.fileStatus = "QUEUED";
         await videoModelResult.save();
 
         return res.status(201).json({
@@ -243,6 +257,8 @@ const videoUploading = async (req: Request, res: Response) => {
                 format: cloudUploadResult.format,
                 bytes: cloudUploadResult.bytes,
                 duration: cloudUploadResult.duration,
+                status: "QUEUED",
+                jobID: job.id
             },
         })
     } catch (error) {
