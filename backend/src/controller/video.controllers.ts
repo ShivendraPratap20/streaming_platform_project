@@ -1,9 +1,7 @@
-import { createReadStream } from "node:fs";
-import { stat } from "node:fs/promises";
+import fs, { createReadStream } from "node:fs";
+import fsp, { stat } from "node:fs/promises";
 import { pipeline } from "node:stream/promises";
 import path from "node:path";
-import fs from "node:fs";
-import fsp from "node:fs/promises";
 import { Request, Response } from "express";
 import mongoose from "mongoose";
 import { parseRange, runFFmpeg, dummyVideoData } from "../utils/index.js";
@@ -274,8 +272,43 @@ const videoUploading = async (req: Request, res: Response) => {
     }
 }
 
+const videoStreaming = async (req: Request, res: Response) => {
+    try {
+        const videoID = req.params.id;
+        if (!videoID)
+            return res.status(404).json({
+                status: false,
+                message: 'Invalid ID or missing',
+            });
+
+        const videoData = await videoModel.findOne({ _id: videoID });
+
+        if (!videoData)
+            return res.status(404).json({
+                status: 404,
+                message: 'Video not found'
+            });
+
+        res.status(200).json({
+            status: true,
+            data: videoData,
+        })
+    } catch (error) {
+        console.log(`VDO_STREAM_ERR ${error}`);
+        res.status(500).json({
+            status: false,
+            message: `Error while playing your video`,
+            error: {
+                code: '[VDO_STREAM_ERR]',
+                details: error
+            }
+        })
+    }
+};
+
 export {
     videoStream,
     videoTranscoding,
-    videoUploading
+    videoUploading,
+    videoStreaming,
 }

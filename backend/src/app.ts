@@ -23,7 +23,7 @@ app.use(cors({
 
 app.use(
     "/hls",
-    express.static('/home/cvendra/hls-output/12')
+    express.static('/home/cvendra/hls-output/')
 );
 
 app.use('/api/v1', router);

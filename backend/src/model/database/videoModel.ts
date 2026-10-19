@@ -85,11 +85,14 @@ const videoSchema = new mongoose.Schema(
       default: "UPLOADING",
       required: true,
     },
+    outputDir: { type: String },
+    masterPlaylistPath: { type: String },
     variant: [
       { 
         resolution: {type: Number},
         url: { type: String },
         publicId: { type: String },
+        playlistPath: { type: String },
     }
     ]
   },

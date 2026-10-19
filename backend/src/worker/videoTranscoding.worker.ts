@@ -3,6 +3,7 @@ import { Worker } from "bullmq";
 import videoModel from "../model/database/videoModel.js";
 import { transcodeVideo } from "../utils/transcodeVideo.js";
 import { cloudinary } from "../config/cloudinary.js";
+import { createHls } from "../utils/createHLS.js";
 
 async function main() {
 
@@ -21,28 +22,34 @@ async function main() {
         video.fileStatus = "PROCESSING",
             await video.save();
 
-        const { workDir, outputs } = await transcodeVideo(video.url);
+        // const { workDir, outputs } = await transcodeVideo(video.url);
 
-        console.log('Result after transcoding ', outputs);
+        // console.log('Result after transcoding ', outputs);
 
-        const uploadedVariants = await Promise.all(
-            outputs.map(async (value) => {
-                const result = await cloudinary.uploader.upload(value.filePath, {
-                    resource_type: "video",
-                    folder: `streaming-app/media/video/${videoId}/${value.resolution}p`,
-                    public_id: `streaming-app/media/video/${videoId}/${value.resolution}p`,
-                    overwrite: true,
-                });
+        // const uploadedVariants = await Promise.all(
+        //     outputs.map(async (value) => {
+        //         const result = await cloudinary.uploader.upload(value.filePath, {
+        //             resource_type: "video",
+        //             folder: `streaming-app/media/video/${videoId}/${value.resolution}p`,
+        //             public_id: `streaming-app/media/video/${videoId}/${value.resolution}p`,
+        //             overwrite: true,
+        //         });
 
-                return {
-                    resolution: value.resolution,
-                    url: result.url,
-                    publicId: result.public_id,
-                };
-            })
-        );
+        //         return {
+        //             resolution: value.resolution,
+        //             url: result.url,
+        //             publicId: result.public_id,
+        //         };
+        //     })
+        // );
 
-        video.variant.push(...uploadedVariants);
+        const hlsResult = await createHls(video._id.toString(), video.url);
+        const { outputDir, masterPlaylistPath, variants } = hlsResult;
+
+        video.outputDir = outputDir;
+        video.masterPlaylistPath = masterPlaylistPath;
+
+        video.variant.push(...variants);
         video.fileStatus = "READY";
         await video.save();
 
