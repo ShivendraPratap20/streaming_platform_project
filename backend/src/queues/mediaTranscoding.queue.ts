@@ -1,8 +1,8 @@
 import { Queue } from "bullmq";
 
 
-export const videoTranscodingQueue = new Queue(
-  "video-transcoding",
+export const mediaTranscodingQueue = new Queue(
+  "media-transcoding",
   {
     connection: {
         host: "127.0.0.1",

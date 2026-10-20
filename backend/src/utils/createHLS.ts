@@ -11,11 +11,12 @@ import {
 import path from "node:path";
 import { tmpdir } from "node:os";
 import { pipeline } from "node:stream/promises";
+import { hlsDir } from "../constants/index.js";
 
 const execFileAsync = promisify(execFile);
 
 const TARGET_RESOLUTIONS = [360, 460, 720, 1080];
-const HLS_ROOT = path.resolve("/home/cvendra/hls-output");
+const HLS_ROOT = path.resolve(hlsDir);
 
 
 const VIDEO_BITRATES: Record<number, string> = {

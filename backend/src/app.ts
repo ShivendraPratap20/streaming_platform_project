@@ -7,6 +7,7 @@ import cors from "cors";
 import "./config/database/connection.js";
 import { router } from './routes/video.routes.js';
 import { redisConnect}  from './config/redis.config.js';
+import mediaRouter from "./routes/media.routes.js";
 
 const app = express();
 
@@ -26,7 +27,8 @@ app.use(
     express.static('/home/cvendra/hls-output/')
 );
 
-app.use('/api/v1', router);
+//app.use('/api/v1', router);
+app.use('/api/v1/media', mediaRouter);
 
 app.listen(PORT, () => {
     console.log(`Server is started at port ${PORT}`);

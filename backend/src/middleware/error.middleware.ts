@@ -10,7 +10,7 @@ function errorHandler(err, req: Request, res: Response, next: NextFunction): voi
     console.error(err);
 
     res.status(statusCode).json({
-        success: false,
+        status: false,
         message: err.isOperational
             ? err.message
             : "Internal Server Error",
