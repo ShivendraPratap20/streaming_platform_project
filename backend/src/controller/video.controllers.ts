@@ -275,13 +275,14 @@ const videoUploading = async (req: Request, res: Response) => {
 const videoStreaming = async (req: Request, res: Response) => {
     try {
         const videoID = req.params.id;
-        if (!videoID)
+
+        if (!videoID || !mongoose.isValidObjectId(videoID))
             return res.status(404).json({
                 status: false,
                 message: 'Invalid ID or missing',
             });
 
-        const videoData = await videoModel.findOne({ _id: videoID });
+        const videoData = await videoModel.findOne({ _id:  new mongoose.Types.ObjectId(videoID) });
 
         if (!videoData)
             return res.status(404).json({
