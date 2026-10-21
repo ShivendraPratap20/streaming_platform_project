@@ -1,20 +1,40 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, ErrorRequestHandler } from "express";
+import { AppError } from "../utils/AppError.js";
 
-function errorHandler(err, req: Request, res: Response, next: NextFunction): void {
+const isDev = true;
+
+function errorHandler(err: Error, req: Request, res: Response, next: NextFunction) {
     if (res.headersSent) {
         return next(err);
     }
 
-    const statusCode = err.statusCode || 500;
+    if (err instanceof AppError && err.isOperational) {
+        return res.status(err.statusCode).json({
+            status: false,
+            message: err.message,
+            errorDetails: err.errorDetails,
+            ...(isDev && { stack: err.stack }),
+        });
+    }
 
-    console.error(err);
+    console.error("UNEXPECTED ERROR:", {
+        method: req.method,
+        url: req.originalUrl,
+        error: err,
+    });
 
-    res.status(statusCode).json({
-        status: false,
-        message: err.isOperational
-            ? err.message
-            : "Internal Server Error",
+    return res.status(500).json({
+        success: false,
+        message: isDev ? err.message : "Something went wrong",
+        ...(isDev && { stack: err.stack }),
     });
 }
 
+const notFound = (req: Request, res: Response, next: NextFunction) => {
+    next(new AppError(`Route ${req.method} ${req.originalUrl} not found`, 404));
+};
+
 export default errorHandler;
+export {
+    notFound,
+};
