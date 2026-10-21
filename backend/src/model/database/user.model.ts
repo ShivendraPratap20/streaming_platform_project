@@ -45,21 +45,10 @@ const userSchema = new mongoose.Schema({
 
 }, { timestamps: true });
 
-userSchema.methods.generateToken = async function () {
-    if (process.env.SECRET_KEY === undefined) {
-        throw new AppError('SECRET_KEY is not defined in the environment variables.', 500);
-    }
-    const token = await jwt.sign({ _id: this._id }, process.env.SECRET_KEY);
-    this.tokens = this.tokens.concat({ token: token });
-    await this.save();
-    return token;
-};
-
-userSchema.pre('save', async function (next) {
+userSchema.pre('save', async function () {
     if (this.isModified("password") && this.password) {
         this.password = await bcrypt.hash(this.password, 10);
     }
-    next();
 });
 
 const userModel = mongoose.model('user', userSchema);

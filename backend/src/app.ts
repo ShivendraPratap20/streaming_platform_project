@@ -11,7 +11,6 @@ import errorHandler, { notFound } from "./middleware/error.middleware.js";
 import userRouter from "./routes/user.routes.js";
 
 const app = express();
-console.log("Environment Variables:", process.env.DB_CONN_URI, process.env.NODE_ENV, process.env.PORT);
 const PORT: number = Number(process.env.PORT) || 8000;
 
 app.use(express.json());
