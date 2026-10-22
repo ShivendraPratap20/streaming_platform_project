@@ -3,6 +3,7 @@ dotenv.config();
 
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import connectDB from "./config/database/connection.js";
 import { router } from './routes/video.routes.js';
 import { redisConnect } from './config/redis.config.js';
@@ -14,6 +15,7 @@ const app = express();
 const PORT: number = Number(process.env.PORT) || 8000;
 
 app.use(express.json());
+app.use(cookieParser());
 
 await connectDB();
 redisConnect();

@@ -50,7 +50,7 @@ function verifyToken(token: string, tokenType: 'access' | 'refresh'): { isValid:
 
     const tokenData = jwt.verify(token, tokenSecretKey);
     if (!tokenData)
-        throw new AppError('No data for token', 400);
+        return { isValid: false };
 
     return { isValid: true, data: tokenData }
 }

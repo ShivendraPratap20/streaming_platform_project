@@ -18,10 +18,9 @@ const SAME_SITE: 'none' | 'lax' = process.env.NODE_ENVIRONMENT == 'PRODUCTION' ?
 
 
 
-const GOOGLE_REDIRECT_URL = `${BASE_URL}/api/v1/user/auth/google/callback`;
+const GOOGLE_REDIRECT_URL = `http://localhost:8000/api/v1/user/auth/google/callback`;
 const GOOGLE_AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
 const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
-
 
 export {
     FRONTEND_URL,

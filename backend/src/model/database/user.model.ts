@@ -35,9 +35,9 @@ const userSchema = new mongoose.Schema({
     },
     profilePicture: { type: String, default: null, trim: true },
     tokens: [{ token: { type: String } }],
-    accountType: { type: String, enum: ['USER', 'CREATOR'], default: 'USER' },
-    authorizationType: { type: String, enum: ['EMAIL', 'GOOGLEAUTH'], default: 'EMAIL' },
-    isEmailVerified: { type: Boolean, default: false },
+    accountType: { type: String, enum: ['USER', 'CREATOR'], default: 'USER', immutable: true },
+    authorizationType: { type: String, enum: ['EMAIL', 'GOOGLEAUTH'], default: 'EMAIL', immutable: true },
+    isEmailVerified: { type: Boolean, default: false, immutable: true },
     mediaFiles: {
         videoFiles: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Media' }],
         audioFiles: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Media' }]
