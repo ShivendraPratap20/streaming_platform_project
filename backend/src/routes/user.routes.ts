@@ -1,5 +1,5 @@
 import express from 'express';
-import { registerUser, googleLoginHandler, googleCallbackHandler, userLogin, userModify, userDelete, userLogout, authSelf } from '../controller/user.controller.js';
+import { registerUser, googleLoginHandler, googleCallbackHandler, userLogin, userModify, userDelete, userLogout, authSelf, tokenRefreshHandler } from '../controller/user.controller.js';
 import authMiddleware from '../middleware/auth.middleware.js';
 
 const userRouter = express.Router();
@@ -12,5 +12,6 @@ userRouter.post('/login', userLogin);
 userRouter.put('/modify', authMiddleware, userModify);
 userRouter.delete('/delete', authMiddleware, userDelete);
 userRouter.post('/logout', authMiddleware, userLogout);
+userRouter.get('/auth/refresh', tokenRefreshHandler);
 
 export default userRouter;

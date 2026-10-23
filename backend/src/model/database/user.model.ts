@@ -39,8 +39,8 @@ const userSchema = new mongoose.Schema({
     authorizationType: { type: String, enum: ['EMAIL', 'GOOGLEAUTH'], default: 'EMAIL', immutable: true },
     isEmailVerified: { type: Boolean, default: false, immutable: true },
     mediaFiles: {
-        videoFiles: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Media' }],
-        audioFiles: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Media' }]
+        videoFiles: [{ type: mongoose.Schema.Types.ObjectId, ref: 'media' }],
+        audioFiles: [{ type: mongoose.Schema.Types.ObjectId, ref: 'media' }]
     },
 
 }, { timestamps: true });

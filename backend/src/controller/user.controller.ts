@@ -6,13 +6,14 @@ import userModel from '../model/database/user.model.js';
 import { AppError } from '../utils/AppError.js'
 import sessionModel from '../model/database/session.model.js';
 import { SAME_SITE, SECURE, ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY, GOOGLE_REDIRECT_URL, GOOGLE_AUTH_URL, GOOGLE_TOKEN_URL, FRONTEND_URL } from '../constants/index.js';
+import { verifyToken } from '../utils/authUtils/index.js';
 
 const authSelf = async (req: Request, res: Response) => {
-    const isAuthenticated:boolean | undefined = req.isAuthenticated;
-    if(!isAuthenticated)
-        return res.status(401).json({status: false, message: 'Not Authenticated'});
+    const isAuthenticated: boolean | undefined = req.isAuthenticated;
+    if (!isAuthenticated)
+        return res.status(401).json({ status: false, message: 'Not Authenticated' });
 
-    res.status(200).json({ status: true, message: 'Authenticated', data: req.authenticatedUserData});
+    res.status(200).json({ status: true, message: 'Authenticated', data: req.authenticatedUserData });
 };
 
 const registerUser = async (req: Request, res: Response) => {
@@ -177,7 +178,7 @@ const userLogin = async (req: Request, res: Response) => {
         throw new AppError('Invalid userID or password', 400);
     }
 
-    const tokenData = new sessionModel({ userID: userData._id });
+    const tokenData = new sessionModel({ userID: userData.userID });
 
     const { accessToken, refreshToken }: { accessToken: string, refreshToken: string } = await tokenData.generateTokens(userData);
     if (accessToken && refreshToken) {
@@ -204,7 +205,7 @@ const userModify = async (req: Request, res: Response) => {
     const userID = req.authenticatedUserData?.userID;
     let { updatingData } = req.body;
 
-    updatingData = await userUpdateSchema.parseAsync({ updatingData });
+    updatingData = await userUpdateSchema.parseAsync(updatingData);
 
     if (!updatingData || Object.keys(updatingData).length === 0)
         throw new AppError('No valid data provided for update', 400);
@@ -255,6 +256,44 @@ const userLogout = async (req: Request, res: Response) => {
     });
 };
 
+const tokenRefreshHandler = async (req: Request, res: Response) => {
+    const token = req.cookies.refreshToken;
+    if (!token)
+        throw new AppError('No Session', 401);
+
+    const { isValid, data } = verifyToken(token, "refresh");
+
+    if (!isValid)
+        throw new AppError('Session Expired', 401);
+
+    const sessionData = await sessionModel.findOne({ _id: data._id });
+
+    if (!sessionData || (new Date(sessionData.refreshTokenExpiresAt).getTime() < Date.now()))
+        throw new AppError('Session Expired', 401);
+
+    const userData = await userModel.findOne({ userID: sessionData.userID });
+    const tokenData = new sessionModel({ userID: sessionData.userID });
+
+    const { accessToken, refreshToken }: { accessToken: string, refreshToken: string } = await tokenData.generateTokens(userData);
+    if (accessToken && refreshToken) {
+        await tokenData.save();
+
+        res.cookie("accessToken", accessToken, {
+            httpOnly: true,
+            secure: SECURE,
+            sameSite: SAME_SITE,
+            maxAge: ACCESS_TOKEN_EXPIRY.getTime() - Date.now(),
+        });
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            secure: SECURE,
+            sameSite: SAME_SITE,
+            maxAge: REFRESH_TOKEN_EXPIRY.getTime() - Date.now(),
+        });
+    }
+    res.status(200).json({status: true, message: 'Tokens generated'});
+};
+
 export {
     registerUser,
     googleLoginHandler,
@@ -264,4 +303,5 @@ export {
     userDelete,
     userLogout,
     authSelf,
+    tokenRefreshHandler,
 };

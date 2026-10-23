@@ -12,14 +12,14 @@ interface TokenPayload {
 
 
 
-async function generateAccessToken({ userName, userID, email }: TokenPayload): Promise<string | undefined> {
+async function generateAccessToken({ _id, userName, userID, email }: TokenPayload): Promise<string | undefined> {
     if (!userID) throw new AppError('No userID provided for access token generation!', 400);
 
     if (!process.env.ACCESS_TOKEN_SECRET_KEY) {
         throw new AppError('ACCESS_TOKEN_SECRET_KEY is not defined in environment variables!', 500);
     }
 
-    const token = jwt.sign({ userName, userID, email }, process.env.ACCESS_TOKEN_SECRET_KEY, {
+    const token = jwt.sign({ _id, userName, userID, email }, process.env.ACCESS_TOKEN_SECRET_KEY, {
         expiresIn: 30 * 60
     })
     if (!token) throw new AppError('No access token generated!', 400);
@@ -34,7 +34,7 @@ async function generateRefreshToken(sessionDocumentID: string): Promise<string |
     }
 
     const token = jwt.sign({ _id: sessionDocumentID }, process.env.REFRESH_TOKEN_SECRET_KEY, {
-        expiresIn: 30 * 60
+        expiresIn: 7 * 24 * 60 * 60
     });
     if (!token) throw new AppError('No refresh token generated!', 400);
     return token;
