@@ -12,7 +12,7 @@ const mediaUploading = async (req: Request, res: Response) => {
         throw new AppError('Invalid Request', 400);
 
     const { _id: artistObjectID, userName: artistName, userID: artistUserID } = authenticatedUserData;
-    const { mediaType } = req.body;
+    let { mediaType } = req.body;
 
     if (!req.file || (mediaType !== "video" && mediaType !== "audio")) {
         throw new AppError("Please upload an audio or video file.", 400);
@@ -21,6 +21,8 @@ const mediaUploading = async (req: Request, res: Response) => {
     if (!mongoose.isValidObjectId(artistObjectID)) {
         throw new AppError("Invalid artist ObjectId", 400);
     }
+
+    mediaType = req.file.mimetype.slice(0, req.file.mimetype.indexOf("/"));
 
     const cloudUploadResult = await cloudinary.uploader.upload(
         req.file.path,
@@ -53,8 +55,14 @@ const mediaUploading = async (req: Request, res: Response) => {
     });
     await mediaModelResult.save();
 
+    const fileArrayName = (mediaType == 'video') ?
+        {
+            "mediaFiles.videoFiles": mediaModelResult._id
+        } : {
+            "mediaFiles.audioFiles": mediaModelResult._id
+        };
     const artistData = await userModel.findOneAndUpdate({ $and: [{ _id: artistObjectID }, { userName: artistName }, { userID: artistUserID }] },
-        { $push: { "mediaFiles.videoFiles": mediaModelResult._id } }
+        { $push: fileArrayName }
     );
 
     const job = await mediaTranscodingQueue.add(
@@ -163,12 +171,12 @@ const getMediaById = async (req: Request, res: Response) => {
 
 };
 
-const modifyMediaFile = async(req: Request, res: Response) => {
+const modifyMediaFile = async (req: Request, res: Response) => {
     const mediaFileID = req.params.id;
     const result = await mediaModifyingSchema.safeParseAsync(req.body);
     const { authenticatedUserData } = req;
 
-    if(!result.success)
+    if (!result.success)
         throw new AppError('Invalid/Missing fields to modify', 403);
 
     if (!mediaFileID || !mongoose.isValidObjectId(mediaFileID))
@@ -184,12 +192,12 @@ const modifyMediaFile = async(req: Request, res: Response) => {
         "artist.artistObjectID": artistObjectID,
         "artist.artistUserID": artistUserID,
     },
-    {
-        $set: { mediaName: newMediaName } 
-    },
-);
+        {
+            $set: { mediaName: newMediaName }
+        },
+    );
 
-    if(!modifyFileData)
+    if (!modifyFileData)
         throw new AppError('No file found to update', 404);
 
     res.status(200).json({
@@ -199,11 +207,39 @@ const modifyMediaFile = async(req: Request, res: Response) => {
     });
 };
 
+const deleteMediaFile = async (req: Request, res: Response) => {
+    const mediaFileID = req.params.id;
+    const { authenticatedUserData } = req;
+
+    if (!mediaFileID || !mongoose.isValidObjectId(mediaFileID))
+        throw new AppError('Invalid media file ID', 401);
+
+    const { _id: artistObjectID, userName: artistName, userID: artistUserID } = authenticatedUserData;
+
+    const deleteFileData = await mediaModel.findOneAndDelete(
+        {
+            _id: mediaFileID,
+            "artist.artistName": artistName,
+            "artist.artistObjectID": artistObjectID,
+            "artist.artistUserID": artistUserID,
+        }
+    )
+
+    if (!deleteFileData)
+        throw new AppError('No file found to update', 404);
+
+    res.status(200).json({
+        status: true,
+        message: 'File updated successfully',
+        data: deleteFileData,
+    });
+};
 
 export {
     mediaUploading,
     mediaStreaming,
     getAllMedia,
     getMediaById,
-    modifyMediaFile
+    modifyMediaFile,
+    deleteMediaFile
 }
