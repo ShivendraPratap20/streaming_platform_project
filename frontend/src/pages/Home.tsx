@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router";
+import TabComponent from '../components/TabComponent';
 
 export default function Home(): React.JSX.Element{
     const navigate = useNavigate();
@@ -9,7 +10,6 @@ export default function Home(): React.JSX.Element{
     }
 
     return <>   
-        <h1>Home Page</h1>
-        <button onClick={onClickHandler}>Play Video</button>
+        <TabComponent/>
     </>
 }
