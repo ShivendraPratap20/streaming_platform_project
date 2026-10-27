@@ -9,8 +9,8 @@ interface ButtonProps{
 const TabButtons = ({ icon: Icon, label }: ButtonProps):React.JSX.Element => {
     return(
         <div className="tab-button flex flex-row gap-x-2 justify-start items-center px-2 py-4">
-            <Icon size={28}/>
-            <p>{label}</p>
+            <Icon size={28} color="var(--color-text_label)"/>
+            <p className="text-text_label">{label}</p>
         </div>
     )
 };
