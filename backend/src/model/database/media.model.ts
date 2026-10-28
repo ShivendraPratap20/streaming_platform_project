@@ -91,7 +91,8 @@ const mediaSchema = new mongoose.Schema(
         playlistPath: { type: String },
     }
     ],
-    hlsURL: { type: String }
+    hlsURL: { type: String },
+    playCount: { type: Number },
   },
   {
     timestamps: true,
