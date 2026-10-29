@@ -6,7 +6,7 @@ const tabButtonArray: TabButtons[] = [
     { buttonName: "Home", buttonIcon: Home },
     { buttonName: "Movies", buttonIcon: Clapperboard },
     { buttonName: "Music", buttonIcon: ListMusicIcon },
-    { buttonName: "My Uploads", buttonIcon: FolderUp },
+    { buttonName: "Uploads", buttonIcon: FolderUp },
     { buttonName: "Favorites", buttonIcon: HeartPlus },
 ];  
 
