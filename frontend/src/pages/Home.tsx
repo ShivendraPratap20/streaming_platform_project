@@ -7,9 +7,9 @@ import Banner from "../components/Banner";
 export default function Home(): React.JSX.Element {
     const navigate = useNavigate();
 
-    return <div className="bg-page_bg lg:flex flex-row">
+    return <div className="bg-page_bg lg:flex flex-row h-[100vh] md:w-[100vw]">
         <TabComponent />
-        <main className="flex flex-col gap-y-5 px-4 py-4">
+        <main className="flex flex-col gap-y-5 px-4 py-4 md:w-[80vw]">
             <nav className="flex flex-row justify-end items-center gap-x-2">
                 <div className="bg-container rounded-4xl px-2 py-2">
                     <Bell size={22} color="var(--color-text_label)"/>
