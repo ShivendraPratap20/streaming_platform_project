@@ -1,8 +1,14 @@
-import "../config/database/connection.js";
+import dotenv from "dotenv";
+import path from "node:path";
+import connectDB from "../config/database/connection.js";
 import { Worker } from "bullmq";
 import mediaModel from "../model/database/media.model.js";
 import { createHls } from "../utils/createHLS.js";
 import { createHLSAudio } from "../utils/createHLS.audio.js";
+
+
+dotenv.config({path: path.resolve(process.cwd(), "../../.env")});
+await connectDB();
 
 async function main() {
 

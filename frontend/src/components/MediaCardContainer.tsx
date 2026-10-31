@@ -12,7 +12,7 @@ const MediaCardContainer = ({
         <section className="w-full flex flex-col gap-3">
 
             {/* Section Heading */}
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
+            <h2 className="text-lg sm:text-xl font-semibold text-text_primary">
                 {title}
             </h2>
 

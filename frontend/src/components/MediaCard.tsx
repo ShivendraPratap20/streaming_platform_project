@@ -1,21 +1,13 @@
 
 import React from "react";
 import { type MediaDataType } from "../utils/interfaces";
-import { Meta, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
+import { mediaDurationFormat } from "../utils";
 
-const MediaCard = ({
-    _id,
-    mediaName,
-    mediaType,
-    mediaDetails: { duration }
-}: MediaDataType): React.JSX.Element => {
+const MediaCard = (Media: MediaDataType): React.JSX.Element => {
+    let { _id, mediaDetails: { duration }, mediaName, mediaType } = Media;
     const navigate = useNavigate();
-    duration = Math.floor(duration);
-    const formattedDuration = `${Math.floor(duration / 60)
-        .toString()
-        .padStart(2, "0")}:${(duration % 60)
-            .toString()
-            .padStart(2, "0")}`;
+    const formattedDuration:string = mediaDurationFormat(duration);
     return (
         <div
             className="
@@ -28,14 +20,13 @@ const MediaCard = ({
         bg-container
         cursor-pointer
       "
-      onClick={()=>{
-        navigate(`/player/${_id}`, {
-            state: {
-                mediaName,
-                mediaType,
-            }
-        })
-      }}
+            onClick={() => {
+                navigate(`/player/${_id}`, {
+                    state: {
+                        Media,
+                    }
+                })
+            }}
         >
             <div className="relative w-full flex-1 min-h-0">
                 <img

@@ -1,19 +1,22 @@
 import { createBrowserRouter } from 'react-router';
 import Home from '../pages/Home';
 import VideoPlayerPage from '../pages/VideoPlayer';
+import MainLayout from './MainLayout';
 
 const router = createBrowserRouter([
   {
-    path: '/',
-    element: <Home />
+    element: <MainLayout />,
+    children: [
+      {
+        path: "/",
+        element: <Home />,
+      },
+      {
+        path: "/player/:id",
+        element: <VideoPlayerPage />,
+      },
+    ]
   },
-  {
-    path: "/player/:id",
-    element: <VideoPlayerPage />,
-    loader: async ({ params }) => {
-      return params.id;
-    }
-  }
 ]);
 
 export default router;
