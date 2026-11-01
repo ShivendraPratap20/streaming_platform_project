@@ -236,7 +236,7 @@ const deleteMediaFile = async (req: Request, res: Response) => {
 };
 
 const getTrendingMedia = async(req: Request, res: Response) => {
-    let trendingMedia = await mediaModel.find({}).sort({playCount: -1}).limit(3);
+    let trendingMedia = await mediaModel.find({}).sort({playCount: -1}).limit(5);
     res.status(202).json({ status: true, data: trendingMedia, count: trendingMedia.length});
 };
 

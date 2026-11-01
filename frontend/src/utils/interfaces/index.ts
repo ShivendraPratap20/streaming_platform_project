@@ -1,8 +1,8 @@
 import { type LucideIcon } from "lucide-react"
 
 interface TabButtons {
-    buttonName: string,
-    buttonIcon: LucideIcon
+  buttonName: string,
+  buttonIcon: LucideIcon
 };
 
 
@@ -38,13 +38,49 @@ interface MediaDataType {
   playCount: number;
 }
 
-interface MediaCardContainerData{
-    title: string, 
-    mediaCardData: MediaDataType[],
+interface MediaCardContainerData {
+  title: string,
+  mediaCardData: MediaDataType[],
 }
 
+interface PlaybackControlsProps {
+  isPlaying: boolean;
+  currentTime: number;
+  duration: number;
+  onTogglePlayBack: () => void;
+};
+
+type TimeRange = {
+  start: number;
+  end: number;
+};
+
+interface ProgressBarProps {
+    currentTime: number;
+    duration: number;
+    bufferedRanges: TimeRange[];
+    onSeek: (time: number) => void;
+};
+
+interface QualityLevel {
+  index: number;
+  height: number;
+  bitrate: number;
+};
+
+interface QualitySelectorProps {
+    levels: QualityLevel[];
+    selectedLevel: number;
+    onSelect: (level: number) => void;
+};
+
 export {
-    type TabButtons,
-    type MediaDataType,
-    type MediaCardContainerData,
+  type TabButtons,
+  type MediaDataType,
+  type MediaCardContainerData,
+  type PlaybackControlsProps,
+  type TimeRange,
+  type ProgressBarProps,
+  type QualityLevel,
+  type QualitySelectorProps,
 }
