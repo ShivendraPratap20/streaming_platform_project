@@ -2,7 +2,8 @@ import { type LucideIcon } from "lucide-react"
 
 interface TabButtons {
   buttonName: string,
-  buttonIcon: LucideIcon
+  buttonIcon: LucideIcon,
+  path: string,
 };
 
 
@@ -74,6 +75,10 @@ interface QualitySelectorProps {
     onSelect: (level: number) => void;
 };
 
+interface ModalStateProps {
+  modalName: string;
+};
+
 export {
   type TabButtons,
   type MediaDataType,
@@ -83,4 +88,5 @@ export {
   type ProgressBarProps,
   type QualityLevel,
   type QualitySelectorProps,
+  type ModalStateProps,
 }

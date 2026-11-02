@@ -3,11 +3,11 @@ import { Home, Clapperboard, ListMusicIcon, FolderUp, HeartPlus } from "lucide-r
 
 
 const tabButtonArray: TabButtons[] = [
-    { buttonName: "Home", buttonIcon: Home },
-    { buttonName: "Movies", buttonIcon: Clapperboard },
-    { buttonName: "Music", buttonIcon: ListMusicIcon },
-    { buttonName: "Uploads", buttonIcon: FolderUp },
-    { buttonName: "Favorites", buttonIcon: HeartPlus },
+    { buttonName: "Home", buttonIcon: Home, path: "/" },
+    { buttonName: "Movies", buttonIcon: Clapperboard, path: "/movies" },
+    { buttonName: "Music", buttonIcon: ListMusicIcon, path: "/music" },
+    { buttonName: "Uploads", buttonIcon: FolderUp, path: "/uploads" },
+    { buttonName: "Favorites", buttonIcon: HeartPlus, path: "/favorites" },
 ];
 
 const mediaDurationFormat = (duration: number): string => {

@@ -1,5 +1,5 @@
 import express, { Request, Response} from "express";
-import { mediaUploading, mediaStreaming, getAllMedia, getMediaById, modifyMediaFile, deleteMediaFile, getTrendingMedia } from "../controller/media.controller.js";
+import { mediaUploading, mediaStreaming, getAllMedia, getMediaById, modifyMediaFile, deleteMediaFile, getTrendingMedia, getHomePageMedia } from "../controller/media.controller.js";
 import upload from '../middleware/upload.middleware.js';
 import authMiddleware from "../middleware/auth.middleware.js";
 
@@ -12,5 +12,6 @@ mediaRouter.get("/myMedia/:id", authMiddleware, getMediaById);
 mediaRouter.put("/:id", authMiddleware, modifyMediaFile);
 mediaRouter.delete("/:id", authMiddleware, deleteMediaFile);
 mediaRouter.get("/trending", getTrendingMedia);
+mediaRouter.get("/homeMedia", getHomePageMedia);
 
 export default mediaRouter;
