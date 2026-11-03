@@ -3,11 +3,11 @@ import type { ModalStateProps } from '../../utils/interfaces';
 import LoginModal from './LoginModal';
 
 
-const GlobalModal = ({ modalState }: { modalState: ModalStateProps | null }) => {
+const GlobalModal = ({ modalState, onClose }: { modalState: ModalStateProps | null; onClose: () => void }) => {
 
     switch (modalState?.modalName) {
         case 'login':
-            return <LoginModal isOpen={true} onClose={() => {}} />;
+            return <LoginModal isOpen={true} onClose={onClose} />;
         default:
             return null;
     }

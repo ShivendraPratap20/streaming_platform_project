@@ -7,19 +7,22 @@ import router from './routes/routes';
 import { store } from './redux/store/store';
 import { ModalProvider } from './Provider/ModalProvider';
 
-function App(): React.JSX.Element {
+const queryClient = new QueryClient();
 
-  const queryClient = new QueryClient();
+function App(): React.JSX.Element {  
 
   return (
-    <ModalProvider>
-      <Provider store={store}>
-        <QueryClientProvider client={queryClient}>
+    <Provider store={store}>
+      <QueryClientProvider client={queryClient}>
+        <ModalProvider>
           <RouterProvider router={router} />
-        </QueryClientProvider>
-      </Provider>
-    </ModalProvider>
+        </ModalProvider>
+      </QueryClientProvider>
+    </Provider>
   )
 }
 
 export default App
+export {
+  queryClient,
+}

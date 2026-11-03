@@ -2,6 +2,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import MediaCard from "../MediaCard";
 import { useModalContext } from "../../context/ModalContext";
+import useAuth from '../../hooks/useAuth';
 
 const useHomeMediaData = () => {
     const homeMediaData = useSelector((state: any) => state.homeMediaData);
@@ -10,13 +11,16 @@ const useHomeMediaData = () => {
 
 const ProfileBadge = ({ userName, profileImageURL }: { userName: string; profileImageURL: string }): React.JSX.Element => {
     const { openModal } = useModalContext();
+    const { isLoading, data, isAuthenticated } = useAuth();
     return (
         <div className="lg:flex flex-row items-center p-2 rounded-4xl bg-container w-[100%]"
             onClick={() => openModal('login')}
         >
             <div className="user-info-pic-text flex flex-row gap-x-2 items-center">
                 <img src={profileImageURL} alt={`${userName}'s profile`} width={50} height={50} className="rounded-full" />
-                <p className="user-info-text text-text_label text-sm">{userName}</p>
+                <p className="user-info-text text-text_label text-sm">{
+                    isAuthenticated? data.userName : userName
+                    }</p>
             </div>
         </div>
     );

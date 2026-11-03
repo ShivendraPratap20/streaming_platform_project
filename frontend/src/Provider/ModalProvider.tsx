@@ -20,7 +20,7 @@ export const ModalProvider = ({ children }: { children: React.ReactNode }) => {
     return (
         <ModalContext.Provider value={{ openModal, closeModal }}>
             {children}
-            <GlobalModal modalState={modalState} />
+            <GlobalModal modalState={modalState} onClose={closeModal} />
         </ModalContext.Provider>
     );
 };
