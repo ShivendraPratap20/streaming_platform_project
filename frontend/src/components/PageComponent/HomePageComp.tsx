@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import MediaCard from "../MediaCard";
 import { useModalContext } from "../../context/ModalContext";
 import useAuth from '../../hooks/useAuth';
+import { useNavigate } from "react-router";
 
 const useHomeMediaData = () => {
     const homeMediaData = useSelector((state: any) => state.homeMediaData);
@@ -12,10 +13,16 @@ const useHomeMediaData = () => {
 const ProfileBadge = ({ userName, profileImageURL }: { userName: string; profileImageURL: string }): React.JSX.Element => {
     const { openModal } = useModalContext();
     const { isLoading, data, isAuthenticated } = useAuth();
+    const navigate = useNavigate();
+
+    const clickHandler = () => {
+        isAuthenticated? navigate('/profile') : openModal('login');
+    };
+
     return (
         <div className="lg:flex flex-row items-center p-2 rounded-4xl bg-container w-[100%]"
-            onClick={() => openModal('login')}
-        >
+            onClick={clickHandler}>
+
             <div className="user-info-pic-text flex flex-row gap-x-2 items-center">
                 <img src={profileImageURL} alt={`${userName}'s profile`} width={50} height={50} className="rounded-full" />
                 <p className="user-info-text text-text_label text-sm">{

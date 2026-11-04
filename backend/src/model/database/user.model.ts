@@ -42,7 +42,16 @@ const userSchema = new mongoose.Schema({
         videoFiles: [{ type: mongoose.Schema.Types.ObjectId, ref: 'media' }],
         audioFiles: [{ type: mongoose.Schema.Types.ObjectId, ref: 'media' }]
     },
-
+    mediaHistory:[{ 
+        mediaID: { type: mongoose.Schema.Types.ObjectId, }
+    }],
+    description: { type: String },
+    playlist: [{
+        playlistName: { type: String },
+        playlistItems: [{ type: mongoose.Schema.Types.ObjectId, }],
+        totalDuration: { type: Number }
+    }],
+    favorites: [ { type: mongoose.Schema.Types.ObjectId } ],
 }, { timestamps: true });
 
 userSchema.pre('save', async function () {

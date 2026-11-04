@@ -1,12 +1,31 @@
 import { Request, Response } from 'express';
 import { OAuth2Client, TokenPayload } from 'google-auth-library';
 import bcrypt from 'bcryptjs';
+import mongoose from 'mongoose';
 import { userSignupSchema, userLoginSchema, userUpdateSchema } from '../validators/user.validation.js';
 import userModel from '../model/database/user.model.js';
 import { AppError } from '../utils/AppError.js'
 import sessionModel from '../model/database/session.model.js';
 import { SAME_SITE, SECURE, ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY, GOOGLE_REDIRECT_URL, GOOGLE_AUTH_URL, GOOGLE_TOKEN_URL, FRONTEND_URL } from '../constants/index.js';
 import { verifyToken } from '../utils/authUtils/index.js';
+import mediaModel from '../model/database/media.model.js';
+
+const getMe = async (req: Request, res: Response) => {
+    const { isAuthenticated, authenticatedUserData } = req;
+
+    const { _id, userID, userName, email } = authenticatedUserData;
+
+    if(!isAuthenticated)
+        return res.status(401).json({ status: false, message: 'Not Authenticated' });
+
+    const userData = await userModel.findOne({ _id, userID, userName, email });
+    if(!userData)
+        return res.status(404).json({ status: false, message: 'Not found'});
+
+    console.log(userData);
+
+    res.status(202).json({ status: true, message: 'User found', data: userData });
+};
 
 const authSelf = async (req: Request, res: Response) => {
     const isAuthenticated: boolean | undefined = req.isAuthenticated;
@@ -294,7 +313,90 @@ const tokenRefreshHandler = async (req: Request, res: Response) => {
     res.status(200).json({status: true, message: 'Tokens generated'});
 };
 
+const addFavorites = async (req: Request, res: Response) => {
+    let mediaObjectID = req.params.id;
+    const { _id, userName, userID } = req.authenticatedUserData
+
+    const _mediaID = new mongoose.Types.ObjectId(mediaObjectID);
+
+    if ((!_mediaID || !mongoose.isValidObjectId(_mediaID)))
+        throw new AppError('Invalid media ID', 400);
+
+    const mediaData = await mediaModel.findOne({ _id: _mediaID });
+    if (!mediaData)
+        throw new AppError('No media found', 404);
+
+    const updateUserMediaData = await userModel.findOneAndUpdate({ _id, userName, userID }, {
+        $push: { favorites: _mediaID }
+    });
+
+    if (!updateUserMediaData)
+        throw new AppError('Faild to add to favorite', 400);
+
+    res.status(202).json({
+        status: true,
+        message: 'Added to favorites'
+    });
+};
+
+const createPlaylist = async (req: Request, res: Response) => {
+    const { playlistName, playlistItemName } = req.body;
+    const { _id, userID, userName } = req.authenticatedUserData;
+
+    if (!playlistName)
+        return res.status(200).json({});
+
+
+    const _mediaID = playlistItemName ?? new mongoose.Types.ObjectId(playlistItemName);
+    const mediaData = await mediaModel.findOne({ _id: _mediaID });
+    if (!mediaData)
+        throw new AppError('No media found for given ID', 404);
+
+
+    const existingPlaylist = await userModel.findOneAndUpdate(
+        {
+            _id,
+            userID,
+            userName,
+            "playlist.playlistName": playlistName
+        },
+        {
+            $addToSet: {
+                "playlist.$.playlistItems": _mediaID
+            },
+            $inc: {
+                "playlist.$.totalDuration": mediaData.mediaDetails?.duration || 0
+            }
+        },
+        { new: true }
+    );
+
+    let playlist = existingPlaylist;
+
+    if (!existingPlaylist) {
+        playlist = await userModel.findOneAndUpdate(
+            { _id, userID, userName },
+            {
+                $push: {
+                    playlist: {
+                        playlistName,
+                        playlistItems: [_mediaID],
+                        totalDuration: mediaData.mediaDetails?.duration || 0
+                    }
+                }
+            },
+            { new: true }
+        );
+    }
+    if (!playlist)
+        throw new AppError('Failed to create/add playlist', 400);
+
+    res.status(202).json({ status: true, message: 'Added to playlist' });
+
+};
+
 export {
+    getMe,
     registerUser,
     googleLoginHandler,
     googleCallbackHandler,
@@ -304,4 +406,6 @@ export {
     userLogout,
     authSelf,
     tokenRefreshHandler,
+    addFavorites,
+    createPlaylist,
 };
