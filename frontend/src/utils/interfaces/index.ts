@@ -1,5 +1,9 @@
 import { type LucideIcon } from "lucide-react"
 
+export type AccountType = "USER" | "CREATOR";
+
+export type AuthorizationType = "EMAIL" | "GOOGLEAUTH";
+
 interface TabButtons {
   buttonName: string,
   buttonIcon: LucideIcon,
@@ -57,10 +61,10 @@ type TimeRange = {
 };
 
 interface ProgressBarProps {
-    currentTime: number;
-    duration: number;
-    bufferedRanges: TimeRange[];
-    onSeek: (time: number) => void;
+  currentTime: number;
+  duration: number;
+  bufferedRanges: TimeRange[];
+  onSeek: (time: number) => void;
 };
 
 interface QualityLevel {
@@ -70,14 +74,52 @@ interface QualityLevel {
 };
 
 interface QualitySelectorProps {
-    levels: QualityLevel[];
-    selectedLevel: number;
-    onSelect: (level: number) => void;
+  levels: QualityLevel[];
+  selectedLevel: number;
+  onSelect: (level: number) => void;
 };
 
 interface ModalStateProps {
   modalName: string;
 };
+
+interface User {
+  _id: string;
+
+  userName: string;
+  userID: string;
+  email: string;
+
+  phoneNumber?: number;
+  profilePicture: string | null;
+
+  accountType: AccountType;
+  authorizationType: AuthorizationType;
+  isEmailVerified: boolean;
+
+  mediaFiles: {
+    videoFiles: string[];
+    audioFiles: string[];
+  };
+
+  mediaHistory: {
+    mediaID: string;
+  }[];
+
+  description?: string;
+
+  playlist: {
+    _id?: string;
+    playlistName: string;
+    playlistItems: string[];
+    totalDuration: number;
+  }[];
+
+  favorites: string[];
+
+  createdAt: string;
+  updatedAt: string;
+}
 
 export {
   type TabButtons,
@@ -89,4 +131,5 @@ export {
   type QualityLevel,
   type QualitySelectorProps,
   type ModalStateProps,
+  type User,
 }

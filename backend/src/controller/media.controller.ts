@@ -235,15 +235,15 @@ const deleteMediaFile = async (req: Request, res: Response) => {
     });
 };
 
-const getTrendingMedia = async(req: Request, res: Response) => {
-    let trendingMedia = await mediaModel.find({}).sort({playCount: -1}).limit(5);
-    res.status(202).json({ status: true, data: trendingMedia, count: trendingMedia.length});
+const getTrendingMedia = async (req: Request, res: Response) => {
+    let trendingMedia = await mediaModel.find({}).sort({ playCount: -1 }).limit(5);
+    res.status(202).json({ status: true, data: trendingMedia, count: trendingMedia.length });
 };
 
-const getHomePageMedia = async(req: Request, res: Response) => {
-    let trendingMedia = await mediaModel.find({}).sort({playCount: -1}).limit(5);
-    let movieMedia = await mediaModel.find({mediaType: "video"}).sort({playCount: -1}).limit(5);
-    let musicMedia = await mediaModel.find({mediaType: "audio"}).sort({playCount: -1}).limit(5);
+const getHomePageMedia = async (req: Request, res: Response) => {
+    let trendingMedia = await mediaModel.find({}).sort({ playCount: -1 }).limit(5);
+    let movieMedia = await mediaModel.find({ mediaType: "video" }).sort({ playCount: -1 }).limit(5);
+    let musicMedia = await mediaModel.find({ mediaType: "audio" }).sort({ playCount: -1 }).limit(5);
 
     res.status(202).json({
         status: true,
@@ -260,6 +260,100 @@ const getHomePageMedia = async(req: Request, res: Response) => {
     });
 };
 
+const getDashboardData = async (req: Request, res: Response) => {
+    // const { authenticatedUserData } = req;
+
+    // if (!authenticatedUserData)
+    //     throw new AppError('Bad request', 400);
+
+    // const { _id: artistObjectID, userName: artistName, userID: artistUserID } = authenticatedUserData;
+
+    const artistUserID:string="priya_rai_8";
+    const artistName:string = "Priya Kumari";
+
+    const data = await mediaModel.aggregate([
+        {
+            $match: {
+                "artist.artistUserID": artistUserID,
+                "artist.artistName": artistName
+            }
+        },
+        {
+            $facet: {
+                totalMedia: [
+                    {
+                        $count: "count"
+                    }
+                ],
+
+                videoMedia: [
+                    {
+                        $match: { mediaType: "video" }
+                    },
+                    {
+                        $group: {
+                            _id: null,
+                            count: { $sum: 1 },
+                            files: { $push: "$$ROOT" }
+                        }
+                    }
+                ],
+
+                audioMedia: [
+                    {
+                        $match: { mediaType: "audio" }
+                    },
+                    {
+                        $group: {
+                            _id: null,
+                            count: { $sum: 1 },
+                            files: { $push: "$$ROOT" }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $project: {
+                _id: 0,
+                totalMediaCount: {
+                    $ifNull: [
+                        { $arrayElemAt: ["$totalMedia.count", 0] },
+                        0
+                    ]
+                },
+                videoMedia: {
+                    $ifNull: [
+                        { $arrayElemAt: ["$videoMedia", 0] },
+                        { count: 0, files: [] }
+                    ]
+                },
+                audioMedia: {
+                    $ifNull: [
+                        { $arrayElemAt: ["$audioMedia", 0] },
+                        { count: 0, files: [] }
+                    ]
+                }
+            }
+        },
+        {
+            $project: {
+                totalMediaCount: 1,
+                videoMedia: {
+                    count: 1,
+                    files: 1
+                },
+                audioMedia: {
+                    count: 1,
+                    files: 1
+                }
+            }
+        }
+    ]);
+
+    res.status(200).json({ status: true, message: 'Ok', data });
+};
+
 export {
     mediaUploading,
     mediaStreaming,
@@ -269,4 +363,5 @@ export {
     deleteMediaFile,
     getTrendingMedia,
     getHomePageMedia,
+    getDashboardData,
 }

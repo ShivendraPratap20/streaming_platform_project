@@ -11,4 +11,27 @@
     --color-text_primary: #F8FAFC;
     --color-error: #EF4444;
     --color-dark_blue: #15294D;
+    /* UPLOADING - Blue */
+    --color-uploading-bg: #3B82F6;
+    --color-uploading-text: #1E3A8A;
+
+    /* UPLOADED - Green */
+    --color-uploaded-bg: #22C55E;
+    --color-uploaded-text: #14532D;
+
+    /* QUEUED - Amber */
+    --color-queued-bg: #F59E0B;
+    --color-queued-text: #78350F;
+
+    /* PROCESSING - Purple */
+    --color-processing-bg: #A855F7;
+    --color-processing-text: #581C87;
+
+    /* READY - Teal */
+    --color-ready-bg: #14B8A6;
+    --color-ready-text: #134E4A;
+
+    /* FAILED - Red */
+    --color-failed-bg: #EF4444;
+     --color-failed-text: #EF4444;
 }

@@ -28,7 +28,7 @@ const MainLayout = () => {
 
       <Header />
 
-      <main className="lg:col-span-2 lg:col-start-2 lg:col-end-4 lg:row-span-2 p-0">
+      <main className="lg:col-span-2 lg:col-start-2 lg:col-end-4 lg:row-span-2 p-0 overflow-y-auto scrollbar-thin scrollbar-hide scrollbar-thumb-container scrollbar-track-surface_2">
         <Outlet />
       </main>
     </div>
