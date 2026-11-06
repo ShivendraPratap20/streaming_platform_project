@@ -79,8 +79,9 @@ const mediaUploading = async (req: Request, res: Response) => {
     await mediaModelResult.save();
 
     return res.status(201).json({
+        status:true,
         message: "Media uploaded successfully.",
-        media: {
+        data: {
             publicId: cloudUploadResult.public_id,
             url: cloudUploadResult.secure_url,
             resourceType: cloudUploadResult.resource_type,

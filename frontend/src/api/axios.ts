@@ -5,9 +5,8 @@ const BASE_URL:string = import.meta.env.VITE_API_URL || 'http://localhost:8000/a
 
 const api: AxiosInstance = axios.create({
     baseURL: BASE_URL,
-    timeout: 10000,
+    timeout: 100000,
     withCredentials: true,
-    headers: { 'Content-Type': 'application/json' },
 });
 
 api.interceptors.response.use(
@@ -15,7 +14,7 @@ api.interceptors.response.use(
         return res.data.data;
     },
     (err: AxiosError) => {
-        console.log(`Axios Error while making request`, err.response);
+        console.log(`Axios Error while making request`, err);
         return Promise.reject(err.response?.data);
     }
 );

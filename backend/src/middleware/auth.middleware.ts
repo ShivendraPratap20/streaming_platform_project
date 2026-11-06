@@ -9,23 +9,23 @@ const authMiddleware = async (req: Request, res: Response, next: NextFunction) =
 
     const accessToken = req.cookies?.accessToken;
     if (!accessToken)
-        return res.status(401).json({status: false, message: 'Access token missing/invalid'});;
+        return res.status(401).json({ status: false, message: 'Access token missing/invalid' });;
 
     const tokenVerificationResult = verifyToken(accessToken, "access");
 
     if (!tokenVerificationResult.isValid)
-        return res.status(401).json({status: false, message: 'Access token expired/invalid'});;
+        return res.status(401).json({ status: false, message: 'Access token expired/invalid' });;
 
     const { data } = tokenVerificationResult;
 
     const sessionData = await sessionModel.findOne({ userID: data.userID });
-    
+
     if (sessionData && new Date(sessionData.accessTokenExpiresAt).getTime() > Date.now()) {
         req.isAuthenticated = true;
         req.authenticatedUserData = data;
         return next();
     }
-    return  res.status(401).json({status: false, message: 'Not Authenticated'});;
+    return res.status(401).json({ status: false, message: 'Not Authenticated' });;
 };
 
 export default authMiddleware;
