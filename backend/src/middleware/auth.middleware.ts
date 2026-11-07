@@ -11,6 +11,7 @@ const authMiddleware = async (req: Request, res: Response, next: NextFunction) =
     if (!accessToken)
         return res.status(401).json({ status: false, message: 'Access token missing/invalid' });;
 
+    console.log(req.cookies)
     const tokenVerificationResult = verifyToken(accessToken, "access");
 
     if (!tokenVerificationResult.isValid)
