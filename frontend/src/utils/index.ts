@@ -10,6 +10,13 @@ const tabButtonArray: TabButtons[] = [
     { buttonName: "Favorites", buttonIcon: HeartPlus, path: "/favorites" },
 ];
 
+type FileSizeUnit = "B" | "KB" | "MB" | "GB";
+
+interface FormattedFileSize {
+    value: number;
+    unit: FileSizeUnit;
+}
+
 const mediaDurationFormat = (duration: number): string => {
     duration = Math.floor(duration);
     const formattedDuration = `${Math.floor(duration / 60)
@@ -52,9 +59,27 @@ const updateBufferedRanges = (video: HTMLVideoElement, setBufferedRanges: React.
     setBufferedRanges(ranges);
 };
 
+const fileSizeFormat = (bytes: number): FormattedFileSize => {
+    if (!Number.isFinite(bytes) || bytes < 0) {
+        throw new RangeError("bytes must be a non-negative finite number");
+    }
+
+    const KB = 1024;
+    const MB = KB * 1024;
+    const GB = MB * 1024;
+
+    const round = (n: number) => Number(n.toFixed(2));
+
+    if (bytes >= GB) return { value: round(bytes / GB), unit: "GB" };
+    if (bytes >= MB) return { value: round(bytes / MB), unit: "MB" };
+    if (bytes >= KB) return { value: round(bytes / KB), unit: "KB" };
+    return { value: bytes, unit: "B" };
+};
+
 export {
     tabButtonArray,
     mediaDurationFormat,
     formatTime,
     updateBufferedRanges,
+    fileSizeFormat
 }

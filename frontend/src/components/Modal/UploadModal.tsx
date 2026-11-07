@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { Upload } from "lucide-react";
+import { Upload, CircleCheckBig } from "lucide-react";
 import { useMutation, type UseMutationResult } from "@tanstack/react-query";
 import api from "../../api/axios";
+import { fileSizeFormat } from "../../utils";
 
 const UploadModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) => {
     if (!isOpen)
@@ -39,7 +40,6 @@ const UploadModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            console.log(file)
             setSelectedFile(file);
         }
     };
@@ -85,7 +85,7 @@ const UploadModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
                             <div className="flex flex-row w-[100%] p-4 gap-4 items-center">
                                 <p className="text text_label text-lg text-text_label">Media Size:</p>
                                 <p className="text text_label text-xl text-text_primary">
-                                    {selectedFile.size}
+                                    {Object.values(fileSizeFormat(selectedFile.size)).map((val) => val)}
                                 </p>
                             </div>
                             <div className="flex flex-row w-[100%] p-4 gap-4 items-center">
