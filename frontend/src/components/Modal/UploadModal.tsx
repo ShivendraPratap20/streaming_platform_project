@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { Upload, CircleCheckBig } from "lucide-react";
-import { useMutation, type UseMutationResult } from "@tanstack/react-query";
+import React, { useEffect, useRef, useState } from "react";
+import { Upload } from "lucide-react";
+import { useMutation, } from "@tanstack/react-query";
 import api from "../../api/axios";
 import { fileSizeFormat } from "../../utils";
 
@@ -10,11 +10,27 @@ const UploadModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
 
     const [selectedFile, setSelectedFile] = useState<File | null>();
     const [progress, setProgress] = useState<number>(0);
+    const abortControllerRef = useRef<AbortController | null>(null);
+    const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+
+    useEffect(() => {
+        const handleOnline  =  () => setIsOnline(true);
+        const handleOffline =  () => setIsOnline(false);
+
+        window.addEventListener("online", handleOnline);
+        window.addEventListener("offline", handleOffline);
+
+        return () => {
+            window.removeEventListener("online", handleOnline);
+            window.removeEventListener("offline", handleOffline);
+        }
+    }, []);
 
     const { mutate, isPending, isSuccess, isError, error, data } = useMutation({
-        mutationFn: async (file: File) => {
+        mutationFn: async (uploadOptions: { file: File, signal: AbortSignal}) => {
             const formData = new FormData();
-            formData.append("media", file);
+            formData.append("media", uploadOptions.file);
             formData.append("mediaType", "video");
             const response = await api.post('/media/upload', formData,
                 {
@@ -24,6 +40,7 @@ const UploadModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
                             setProgress(percentage)
                         }
                     },
+                    signal: uploadOptions.signal
                 }
             );
             return response;
@@ -59,8 +76,17 @@ const UploadModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
 
     const handleUpload = () => {
         if (!selectedFile) return
-        mutate(selectedFile)
-    }
+
+        const controller = new AbortController();
+        abortControllerRef.current = controller;
+
+        mutate({ file: selectedFile, signal: controller.signal});
+    };
+
+    const handleCancel = () => {
+        abortControllerRef.current?.abort();
+        abortControllerRef.current = null;
+    };
 
     return (
         <div
@@ -112,12 +138,14 @@ const UploadModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
                 }
                 {
                     isPending ? (
-
+                        <>
                         <div className="w-[100%] h-5 bg-gray-100 rounded-2xl">
                             <div className={`w-[${progress}%] h-[100%] bg-green-400 rounded-2xl`}></div>
                         </div>
+                        <button className="bg-red-300 p-2 rounded-xl">Cancel Upload</button>
+                        </>
                     ) : (
-                        <button className={`${selectedFile ? 'bg-custom_purple' : 'bg-gray-400'} text-lg text-bold text-text_primary p-4 flex flex-row items-center justify-center rounded-xl`}
+                        <button className={`${selectedFile && isOnline ? 'bg-custom_purple' : 'bg-gray-400'} text-lg text-bold text-text_primary p-4 flex flex-row items-center justify-center rounded-xl`}
                             onClick={handleUpload}
                             disabled={!selectedFile}
                         >
@@ -125,6 +153,12 @@ const UploadModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void
                             Upload Media
                         </button>
                     )
+                }
+                {
+                    !isOnline && <div>
+                        <span className="w-10 h-10 bg-red-500"></span>
+                        <p className="text-lg text-red-200">No Internet Connection</p>
+                    </div>
                 }
                 {isSuccess && (
                     <p className="text-green-300">File uploaded successfully!</p>

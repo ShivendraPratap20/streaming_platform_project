@@ -1,5 +1,5 @@
 import axios, { AxiosError} from "axios";
-import type { AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from "axios";
+import type { AxiosInstance, AxiosResponse } from "axios";
 
 const BASE_URL:string = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
@@ -13,10 +13,18 @@ api.interceptors.response.use(
     (res:AxiosResponse) => {
         return res.data.data;
     },
-    (err: AxiosError) => {
-        console.log(`Axios Error while making request`, err);
-        return Promise.reject(err.response?.data);
+    (error: AxiosError) => {
+        console.log(`Axios Error while making request`, error);
+
+        if(axios.isCancel(error))
+            return Promise.reject("UPLOAD_CANCELLED")
+        
+        if (!error.response) {
+                return Promise.reject("NETWORK_ERROR");
+        }
+
+        return Promise.reject(error.response?.data || error);
     }
 );
 
-export default api;
+export default api; 
