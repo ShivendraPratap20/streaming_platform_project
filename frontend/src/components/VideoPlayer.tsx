@@ -61,6 +61,13 @@ const VideoPlayer = ({
         ) => {
             if (!active || !data.fatal) return;
 
+            if(data.response.code == 404){
+                setError('Media file not found or removed');
+                hlsRef.current?.destroy();
+                hlsRef.current = null;
+                return;
+            }
+
             switch (data.type) {
                 case Hls.ErrorTypes.NETWORK_ERROR:
                     console.warn("Fatal HLS network error. Retrying...");
@@ -210,6 +217,7 @@ const VideoPlayer = ({
 
                 onProgress={(event) => {
                     updateBufferedRanges(event.currentTarget, setBufferedRanges);
+                    console.log(event.currentTarget.buffered.start(0))
                 }}
                 onLoadedMetadata={(event) => {
                     updateBufferedRanges(event.currentTarget, setBufferedRanges);
@@ -248,9 +256,6 @@ const VideoPlayer = ({
                         transition-opacity duration-300
                         px-3 pb-3 sm:px-4 sm:pb-4
                     "
-                    onClick={() => {
-                        handleTogglePlayback();
-                    }}
                 >
                     <div className="flex items-center justify-between">
                         <PlaybackControls
@@ -266,8 +271,6 @@ const VideoPlayer = ({
                             onSelect={handleQualityChange}
                         />
                     </div>
-
-
                     {/* Progress Bar */}
                     <div className="w-full">
                         <ProgressBar

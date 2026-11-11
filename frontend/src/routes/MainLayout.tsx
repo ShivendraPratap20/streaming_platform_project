@@ -1,18 +1,13 @@
 import { Outlet } from "react-router";
-import { type UseQueryResult } from "@tanstack/react-query";
 import TabComponent from "../components/TabComponent";
 import Header from "../components/Header";
-import useAuth from "../hooks/useAuth";
-import { useModalContext } from "../context/ModalContext";
 
 const MainLayout = () => {
-  const { isLoading, isError, error, isSuccess, data }:UseQueryResult = useAuth();
-  const { openModal } = useModalContext();
 
   return (
     <div className="
     lg:grid 
-    lg:grid-cols-[15vw_1fr_1fr] 
+    lg:grid-cols-[15vw_2fr_0.5fr] 
     lg:grid-rows-[0.5fr_2fr_1fr] 
     gap-x-4
     gap-y-4
