@@ -4,6 +4,7 @@ import { MonitorPlay, EighthNote, Plus, Heart } from "lucide-react";
 import { type MediaDataType } from "../utils/interfaces";
 import { mediaDurationFormat } from "../utils";
 import VideoPlayer from "../components/VideoPlayer";
+import AudioPlayer from "../components/AudioPlayerComponent";
 import Button from "../components/Button";
 
 export default function VideoPlayerPage(): React.JSX.Element {
@@ -15,7 +16,13 @@ export default function VideoPlayerPage(): React.JSX.Element {
 
     return (
         <div className="flex flex-col gap-y-4 p-4 sm:p-6 md:p-8 lg:p-10">
-            <VideoPlayer src={hlsURL + '/master.m3u8' || ''} />
+           {
+            mediaType == "video"? (
+                 <VideoPlayer src={hlsURL + '/master.m3u8' || ''} />
+            ):(
+                 <AudioPlayer src={hlsURL + '/master.m3u8' || ''} />
+            )
+           }
 
             <section className="media_info_section flex flex-col gap-3">
                 <p className="text-2xl text-text_primary">{mediaName}</p>

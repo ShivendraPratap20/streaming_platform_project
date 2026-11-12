@@ -76,7 +76,7 @@ interface QualityLevel {
 interface QualitySelectorProps {
   levels: QualityLevel[];
   selectedLevel: number;
-  onSelect: (level: number) => void;
+  onSelect?: (level: number) => void;
 };
 
 interface ModalStateProps {
