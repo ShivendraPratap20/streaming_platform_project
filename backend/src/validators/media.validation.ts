@@ -22,6 +22,13 @@ const mediaUploadingSchema = z.object({
     mediaType: z
     .enum(["video", "audio"]),
 
+    aboutMediaInfo: z
+    .string()
+    .trim()
+    .min(90, 'Media description should not be minimum 90 words')
+    .max(200, 'Media description should not be greater than 200 words'),
+    
+
 }).strict();
 
 const mediaModifyingSchema = z.object({

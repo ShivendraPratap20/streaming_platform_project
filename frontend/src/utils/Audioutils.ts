@@ -16,13 +16,21 @@ const handleTogglePlayback = async (audioElement: HTMLAudioElement | null) => {
 };
 
 const handleQualityChange = (level: number, HlsElement: Hls, setSelectedQuality: any) => {
-    if(!HlsElement) return;
+    if (!HlsElement) return;
 
     HlsElement.currentLevel = level;
     setSelectedQuality(level)
 };
 
+const handleSeek = (MediaElement: HTMLVideoElement | HTMLAudioElement | null, time: number) => {
+    
+    if (!MediaElement) return;
+
+    MediaElement.currentTime = time;
+};
+
 export {
     handleTogglePlayback,
     handleQualityChange,
+    handleSeek,
 }

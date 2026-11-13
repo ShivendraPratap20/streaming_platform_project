@@ -2,7 +2,9 @@ import Hls from "hls.js";
 import { useEffect, useRef, useState } from "react";
 import PlaybackControls from "./PlaybackControls";
 import QualitySelector from "./QualitySelector";
-import { type QualityLevel } from "../../utils/interfaces";
+import { updateBufferedRanges } from "../../utils";
+import { type QualityLevel, type TimeRange } from "../../utils/interfaces";
+import ProgressBar from "./ProgressBar";
 
 const AudioPlayer = ({ src }: { src: string }): React.JSX.Element => {
 
@@ -15,6 +17,10 @@ const AudioPlayer = ({ src }: { src: string }): React.JSX.Element => {
 
     const [qualityLevels, setQualityLevels] = useState<QualityLevel[]>([]);
     const [selectedQuality, setSelectedQuality] = useState(-1);
+
+    const [isBuffering, setIsBuffering] = useState(false);
+    const [bufferedRanges, setBufferedRanges] = useState<TimeRange[]>([]);
+
 
     const [error, setError] = useState<string | null>(null);
 
@@ -82,8 +88,19 @@ const AudioPlayer = ({ src }: { src: string }): React.JSX.Element => {
                     setCurrentTime(event.currentTarget.currentTime)
                 }}
                 onDurationChange={(event) => {
+                    updateBufferedRanges(event.currentTarget, setBufferedRanges);
                     setDuration(event.currentTarget.duration);
                 }}
+                onProgress={(event) => {
+                    updateBufferedRanges(event.currentTarget, setBufferedRanges);
+                    console.log(event.currentTarget.buffered.start(0))
+                }}
+                onLoadedMetadata={(event) => {
+                    updateBufferedRanges(event.currentTarget, setBufferedRanges);
+                }}
+                onWaiting={() => setIsBuffering(true)}
+                onPlaying={() => setIsBuffering(false)}
+                onCanPlay={() => setIsBuffering(false)}
             />
             {!error && (
                 <div
@@ -120,12 +137,13 @@ const AudioPlayer = ({ src }: { src: string }): React.JSX.Element => {
                     </div>
                     {/* Progress Bar */}
                     <div className="w-full">
-                        {/* <ProgressBar
+                        <ProgressBar
+                            MediaElement={audioRef.current}
                             currentTime={currentTime}
                             duration={duration}
                             bufferedRanges={bufferedRanges}
-                            onSeek={handleSeek}
-                        /> */}
+                            onSeek={()=>{}}
+                        />
                     </div>
                 </div>
             )}

@@ -46,7 +46,7 @@ const formatTime = (time: number): string => {
     return `${mm}:${ss}`;
 };
 
-const updateBufferedRanges = (video: HTMLVideoElement, setBufferedRanges: React.Dispatch<React.SetStateAction<TimeRange[]>>) => {
+const updateBufferedRanges = (video: HTMLVideoElement | HTMLAudioElement, setBufferedRanges: React.Dispatch<React.SetStateAction<TimeRange[]>>) => {
     const ranges: TimeRange[] = [];
 
     for (let i = 0; i < video.buffered.length; i++) {

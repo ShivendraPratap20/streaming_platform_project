@@ -395,6 +395,21 @@ const createPlaylist = async (req: Request, res: Response) => {
 
 };
 
+const getFavorites = async (req: Request, res: Response) => {
+    const { _id, userID, userName } = req.authenticatedUserData;
+    if(!_id || !userID || !userName) return res.status(401).json({});
+
+    const userData = await userModel.findOne({ _id, userID, userName });
+    const { favorites } = userData;
+
+    if(!userData)
+        throw new AppError('No user found', 404);
+
+    const favData = await mediaModel.find({ _id: { $in: [...favorites]}});
+
+    res.status(200).json({ status: true, data: favData})
+};
+
 export {
     getMe,
     registerUser,
@@ -408,4 +423,5 @@ export {
     tokenRefreshHandler,
     addFavorites,
     createPlaylist,
+    getFavorites,
 };

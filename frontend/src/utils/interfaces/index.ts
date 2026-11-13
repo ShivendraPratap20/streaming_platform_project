@@ -41,6 +41,7 @@ interface MediaDataType {
   hlsURL: string;
   __v: number;
   playCount: number;
+  aboutMediaInfo: string;
 }
 
 interface MediaCardContainerData {

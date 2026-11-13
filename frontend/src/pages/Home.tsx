@@ -18,7 +18,7 @@ export default function Home(): React.JSX.Element {
     });
 
     return <>
-        <main className="flex flex-col gap-y-5  overflow-y-auto h-[100vh] scrollbar-thin scrollbar-thumb-container scrollbar-track-surface_2">
+        <main className="flex flex-col gap-y-5  p-0 ">
 
 
             <Banner />

@@ -27,4 +27,13 @@ api.interceptors.response.use(
     }
 );
 
-export default api; 
+const addToFavorite = async (mediaID: string) => {
+    const response = await api.put(`/user/addFavorite/${mediaID}`);
+    return response;
+};
+
+export default api;
+
+export { 
+    addToFavorite,
+}

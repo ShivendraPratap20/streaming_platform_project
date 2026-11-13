@@ -49,7 +49,7 @@ const QualitySelector = ({
                 rounded-lg shadow-xl overflow-hidden z-50">
 
                     <div className="px-3 py-2 text-xs text-gray-400 border-b border-gray-700">
-                        Video Quality
+                        Audio Quality
                     </div>
 
                     {/* Auto option */}

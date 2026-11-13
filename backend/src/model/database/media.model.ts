@@ -23,6 +23,14 @@ const mediaSchema = new mongoose.Schema(
       required: true,
     },
 
+    aboutMediaInfo: {
+      type: String,
+      required: [true, 'Media info required'],
+      trim: true,
+      minlength: [90, 'User name must be at least 5 characters long'],
+      maxlength: [200, 'User name must be at most 30 characters long'],
+    },
+
     artist: {
       artistName: {
         type: String,
@@ -84,12 +92,12 @@ const mediaSchema = new mongoose.Schema(
     outputDir: { type: String },
     masterPlaylistPath: { type: String },
     variant: [
-      { 
-        resolution: {type: Number},
+      {
+        resolution: { type: Number },
         url: { type: String },
         publicId: { type: String },
         playlistPath: { type: String },
-    }
+      }
     ],
     hlsURL: { type: String },
     playCount: { type: Number },
@@ -99,8 +107,8 @@ const mediaSchema = new mongoose.Schema(
   }
 );
 
-mediaSchema.pre("save", async function() {
-    this.hlsURL = `http://localhost:8000/hls${this.outputDir?.substring(hlsDir.length)}`;
+mediaSchema.pre("save", async function () {
+  this.hlsURL = `http://localhost:8000/hls${this.outputDir?.substring(hlsDir.length)}`;
 });
 
 

@@ -6,7 +6,7 @@ import { handleQualityChange } from "../../utils/Audioutils";
 
 interface PropsTypes extends QualitySelectorProps{
     setSelectedQuality?: () => void,
-    HlsElement: Hls,
+    HlsElement: Hls | null,
 }
 
 const QualitySelector = ({
@@ -28,6 +28,9 @@ const QualitySelector = ({
     );
 
     const handleSelect = (level: number) => {
+        if(!HlsElement)
+            return
+        
         handleQualityChange(level, HlsElement, setSelectedQuality);
         setIsOpen(false);
     };

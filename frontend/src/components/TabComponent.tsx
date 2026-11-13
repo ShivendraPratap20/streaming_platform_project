@@ -16,7 +16,7 @@ const TabComponent = (): React.JSX.Element => {
                         <p className="logo-para text-center lg:text-base text-text_label">Video + Audio Stream</p>
                     </div>
                 </div>
-                <div className="side-tab-btns flex flex-row justify-between lg:flex-col ">
+                <div className="side-tab-btns flex flex-row justify-between lg:flex-col lg:gap-2">
                     {tabButtonArray.map((val) => (
                         <TabButtons key={val.buttonName} icon={val.buttonIcon} label={val.buttonName} path={val.path} />
                     ))}

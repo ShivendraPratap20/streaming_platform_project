@@ -4,7 +4,7 @@ import { cloudinary } from "../config/cloudinary.js";
 import { userModel, mediaModel } from "../model/database/index.js";
 import { mediaTranscodingQueue } from "../queues/mediaTranscoding.queue.js";
 import { AppError } from "../utils/AppError.js";
-import { mediaModifyingSchema } from "../validators/media.validation.js";
+import { mediaUploadingSchema, mediaModifyingSchema } from "../validators/media.validation.js";
 
 const mediaUploading = async (req: Request, res: Response) => {
     const { isAuthenticated, authenticatedUserData } = req;
@@ -12,7 +12,12 @@ const mediaUploading = async (req: Request, res: Response) => {
         throw new AppError('Invalid Request', 400);
 
     const { _id: artistObjectID, userName: artistName, userID: artistUserID } = authenticatedUserData;
-    let { mediaType } = req.body;
+    let { mediaType, aboutMediaInfo } = req.body;
+
+    const result = await mediaUploadingSchema.safeParseAsync({ artistObjectID, artistName, artistUserID, mediaType, aboutMediaInfo });
+
+    if (!result.success)
+        throw new AppError('Invalid media meta data', 400, true, result.error.flatten());
 
     if (!req.file || (mediaType !== "video" && mediaType !== "audio")) {
         throw new AppError("Please upload an audio or video file.", 400);
@@ -79,7 +84,7 @@ const mediaUploading = async (req: Request, res: Response) => {
     await mediaModelResult.save();
 
     return res.status(201).json({
-        status:true,
+        status: true,
         message: "Media uploaded successfully.",
         data: {
             publicId: cloudUploadResult.public_id,
@@ -269,8 +274,8 @@ const getDashboardData = async (req: Request, res: Response) => {
 
     // const { _id: artistObjectID, userName: artistName, userID: artistUserID } = authenticatedUserData;
 
-    const artistUserID:string="priya_rai_8";
-    const artistName:string = "Priya Kumari";
+    const artistUserID: string = "priya_rai_8";
+    const artistName: string = "Priya Kumari";
 
     const data = await mediaModel.aggregate([
         {
