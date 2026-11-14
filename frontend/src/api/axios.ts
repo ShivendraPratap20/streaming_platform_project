@@ -32,8 +32,14 @@ const addToFavorite = async (mediaID: string) => {
     return response;
 };
 
+const addToPlaylist = async (playlistName:string, playlistItemName:string) => {
+    const response = await api.put('/user/createPlaylist', { playlistName, playlistItemName});
+    return response;
+};
+
 export default api;
 
 export { 
     addToFavorite,
+    addToPlaylist,
 }

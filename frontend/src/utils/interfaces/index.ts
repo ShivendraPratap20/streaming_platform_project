@@ -107,7 +107,7 @@ interface User {
     mediaID: string;
   }[];
 
-  description?: string;
+  aboutUserInfo?: string;
 
   playlist: {
     _id?: string;
@@ -122,6 +122,18 @@ interface User {
   updatedAt: string;
 }
 
+interface PlaylistCardData {
+  _id: string;
+  playlistName: string;
+  playlistItems: string[];
+  totalDuration: number
+};
+
+interface PlaylistCardContainerData {
+  title: string,
+  playlistCardData: PlaylistCardData[],
+}
+
 export {
   type TabButtons,
   type MediaDataType,
@@ -133,4 +145,6 @@ export {
   type QualitySelectorProps,
   type ModalStateProps,
   type User,
+  type PlaylistCardContainerData,
+  type PlaylistCardData
 }

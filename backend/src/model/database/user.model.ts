@@ -52,6 +52,13 @@ const userSchema = new mongoose.Schema({
         totalDuration: { type: Number }
     }],
     favorites: [ { type: mongoose.Schema.Types.ObjectId } ],
+    aboutUserInfo: {
+        type: String,
+        trim: true,
+        minlength: [30, 'User name must be at least 30 characters long'],
+        maxlength: [200, 'User name must be at most 200 characters long'],
+    },
+    profileTag: [ { type: String, trim: true } ],
 }, { timestamps: true });
 
 userSchema.pre('save', async function () {

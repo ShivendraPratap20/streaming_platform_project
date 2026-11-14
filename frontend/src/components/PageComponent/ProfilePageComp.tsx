@@ -17,7 +17,7 @@ const ProfileCard = (props: User): React.JSX.Element => {
                     <div>
                         <h1>{props.userName || ""}</h1>
                         <h4>{props.userID || ""}</h4>
-                        <p>{props.description || ""}</p>
+                        <p>{props.aboutUserInfo || ""}</p>
                     </div>
                 </div>
                 <div className="profile_button">

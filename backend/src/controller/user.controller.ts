@@ -15,12 +15,12 @@ const getMe = async (req: Request, res: Response) => {
 
     const { _id, userID, userName, email } = authenticatedUserData;
 
-    if(!isAuthenticated)
+    if (!isAuthenticated)
         return res.status(401).json({ status: false, message: 'Not Authenticated' });
 
     const userData = await userModel.findOne({ _id, userID, userName, email });
-    if(!userData)
-        return res.status(404).json({ status: false, message: 'Not found'});
+    if (!userData)
+        return res.status(404).json({ status: false, message: 'Not found' });
 
     console.log(userData);
 
@@ -310,7 +310,7 @@ const tokenRefreshHandler = async (req: Request, res: Response) => {
             maxAge: REFRESH_TOKEN_EXPIRY.getTime() - Date.now(),
         });
     }
-    res.status(200).json({status: true, message: 'Tokens generated'});
+    res.status(200).json({ status: true, message: 'Tokens generated' });
 };
 
 const addFavorites = async (req: Request, res: Response) => {
@@ -397,17 +397,57 @@ const createPlaylist = async (req: Request, res: Response) => {
 
 const getFavorites = async (req: Request, res: Response) => {
     const { _id, userID, userName } = req.authenticatedUserData;
-    if(!_id || !userID || !userName) return res.status(401).json({});
+    if (!_id || !userID || !userName) return res.status(401).json({});
 
     const userData = await userModel.findOne({ _id, userID, userName });
-    const { favorites } = userData;
+    const { favorites }:any = userData;
 
-    if(!userData)
+    if (!userData)
         throw new AppError('No user found', 404);
 
-    const favData = await mediaModel.find({ _id: { $in: [...favorites]}});
+    const favData = await mediaModel.find({ _id: { $in: [...favorites] } });
 
-    res.status(200).json({ status: true, data: favData})
+    res.status(200).json({ status: true, data: favData })
+};
+
+const getMyPlaylist = async (req: Request, res: Response) => {
+    const { _id, userID, userName } = req.authenticatedUserData;
+    if (!_id || !userID || !userName) return res.status(401).json({});
+
+    const userData = await userModel.findOne({ _id, userID, userName });
+    const { playlist }:any = userData;
+
+    if (!userData)
+        throw new AppError('No user found', 404);
+
+
+    res.status(200).json({ status: true, data: playlist });
+}
+
+const profilePageData = async (req: Request, res: Response) => {
+    const { authenticatedUserData } = req;
+
+    if (!authenticatedUserData)
+        throw new AppError('Bad request', 400);
+
+    const { _id, userName, userID } = authenticatedUserData;
+
+    const userData = await userModel.findOne({ _id, userName, userID }, {
+        _id: 1,
+        userName: 1,
+        userID: 1,
+        email: 1,
+        aboutUserInfo: 1,
+        profilePicture: 1,
+        favorites: 1,
+        playlist: 1,
+        profileTag: 1,
+    });
+
+    if (!userData)
+        throw new AppError('No user found', 404);
+
+    res.status(200).json({ status: true, data: userData });
 };
 
 export {
@@ -424,4 +464,6 @@ export {
     addFavorites,
     createPlaylist,
     getFavorites,
+    profilePageData,
+    getMyPlaylist,
 };

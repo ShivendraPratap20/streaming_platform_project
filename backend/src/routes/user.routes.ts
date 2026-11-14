@@ -1,5 +1,5 @@
 import express from 'express';
-import { registerUser, googleLoginHandler, googleCallbackHandler, userLogin, userModify, userDelete, userLogout, authSelf, tokenRefreshHandler, addFavorites, createPlaylist, getMe, getFavorites } from '../controller/user.controller.js';
+import { registerUser, googleLoginHandler, googleCallbackHandler, userLogin, userModify, userDelete, userLogout, authSelf, tokenRefreshHandler, addFavorites, createPlaylist, getMe, getFavorites, profilePageData, getMyPlaylist } from '../controller/user.controller.js';
 import authMiddleware from '../middleware/auth.middleware.js';
 
 const userRouter = express.Router();
@@ -17,5 +17,7 @@ userRouter.get('/auth/refresh', tokenRefreshHandler);
 userRouter.put('/addFavorite/:id', authMiddleware, addFavorites);
 userRouter.put('/createPlaylist', authMiddleware, createPlaylist);
 userRouter.get('/myFavorites', authMiddleware, getFavorites);
+userRouter.get('/myProfile', authMiddleware, profilePageData);
+userRouter.get('/myPlaylist', authMiddleware, getMyPlaylist);
 
 export default userRouter;

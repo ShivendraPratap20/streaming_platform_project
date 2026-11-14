@@ -1,7 +1,7 @@
-import { useModalContext } from '../../context/ModalContext';
 import type { ModalStateProps } from '../../utils/interfaces';
 import LoginModal from './LoginModal';
 import UploadModal from './UploadModal';
+import PlaylistModal from './PlaylistModal';
 
 const GlobalModal = ({ modalState, onClose }: { modalState: ModalStateProps | null; onClose: () => void }) => {
 
@@ -10,6 +10,8 @@ const GlobalModal = ({ modalState, onClose }: { modalState: ModalStateProps | nu
             return <LoginModal isOpen={true} onClose={onClose} />;
         case 'upload':
             return <UploadModal isOpen={true} onClose={onClose}/>
+        case 'playlist':
+            return <PlaylistModal isOpen={true} onClose={onClose}/>
         default:
             return null;
     }
