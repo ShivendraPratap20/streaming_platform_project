@@ -88,6 +88,12 @@ const userUpdateSchema = z.object({
     .url('Profile picture must be a valid URL')
     .nullable()
     .optional(),
+
+  aboutUserInfo: z
+  .string()
+  .trim()
+  .min(30, 'User name must be at least 30 characters long')
+  .max(200, 'User name must be at most 200 characters long'),
 }).strict();
 
 export type UserSignupInput = z.infer<typeof userSignupSchema>;

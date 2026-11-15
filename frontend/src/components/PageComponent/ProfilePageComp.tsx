@@ -1,8 +1,11 @@
 import { Pencil } from "lucide-react";
 import { type LucideIcon, Video, Music, } from "lucide-react";
 import type { User } from "../../utils/interfaces";
+import { useModalContext } from "../../context/ModalContext";
 
 const ProfileCard = (props: User): React.JSX.Element => {
+    const { openModal, setModalData }: { openModal: (param:string) => void } = useModalContext();
+
     return (
         <div className="profile_container_background rounded-2xl bg-blue-200">
             <div className="profile_container_surface flex flex-col gap-4 md:flex-row justify-between items-center p-4">
@@ -24,6 +27,10 @@ const ProfileCard = (props: User): React.JSX.Element => {
                     <button
                         type="button"
                         className="flex flex-row gap-2 justify-center items-center p-3 sm:text-base md:text-lg text-text_label bg-container rounded-xl"
+                        onClick={() => {
+                            setModalData(props)
+                            openModal('update')
+                        }}
                     >
                         <Pencil size={25} color="var(--color-text_label)" />
                         Edit

@@ -22,8 +22,6 @@ const getMe = async (req: Request, res: Response) => {
     if (!userData)
         return res.status(404).json({ status: false, message: 'Not found' });
 
-    console.log(userData);
-
     res.status(202).json({ status: true, message: 'User found', data: userData });
 };
 

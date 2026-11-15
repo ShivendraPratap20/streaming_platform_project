@@ -5,6 +5,7 @@ import GlobalModal from '../components/Modal/GlobalComponent';
 
 export const ModalProvider = ({ children }: { children: React.ReactNode }) => {
     const [modalState, setModalState] = useState<ModalStateProps | null>(null);
+    const [modalData, setModalData] = useState(null);
 
     const openModal = (modalName: string) => {
         if (modalState) {
@@ -14,13 +15,14 @@ export const ModalProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     const closeModal = () => {
+        setModalData(null);
         setModalState(null);
     };
 
     return (
-        <ModalContext.Provider value={{ openModal, closeModal }}>
+        <ModalContext.Provider value={{ openModal, closeModal, setModalData }}>
             {children}
-            <GlobalModal modalState={modalState} onClose={closeModal} />
+            <GlobalModal modalState={modalState} onClose={closeModal} modalData={modalData}/>
         </ModalContext.Provider>
     );
 };

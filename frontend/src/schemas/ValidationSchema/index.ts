@@ -46,7 +46,6 @@ const SignInValidation = Yup.object({
     .required("Password is required"),
 });
 
-// Profile Update Validation Schema
 const ProfileUpdateValidation = Yup.object({
   userName: Yup.string()
     .min(5, "Name must be at least 5 characters")
@@ -60,6 +59,36 @@ const ProfileUpdateValidation = Yup.object({
     .min(10, "Phone Number must be of 10 digits")
     .matches(/^[0-9]{10}$/, "Phone number must be 10 digits")
     .required("Phone number is required"),
+
+  email: Yup
+    .string()
+    .trim()
+    .email('Please provide a valid email address')
+    .max(254, 'Email cannot exceed 254 characters')
+    .transform((email) => email.toLowerCase())
+    .optional(),
+
+  password: Yup
+    .string()
+    .min(8, 'Password must be at least 8 characters long')
+    .max(128, 'Password cannot exceed 128 characters')
+    .matches(
+      /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
+      "Password must include letters, numbers, and special characters"
+    )
+    .optional(),
+  profilePicture: Yup
+    .string()
+    .trim()
+    .url('Profile picture must be a valid URL')
+    .nullable()
+    .optional(),
+
+  aboutUserInfo: Yup
+    .string()
+    .trim()
+    .min(30, 'User name must be at least 30 characters long')
+    .max(200, 'User name must be at most 200 characters long'),
 });
 
 // Infer TypeScript types from Yup schemas
