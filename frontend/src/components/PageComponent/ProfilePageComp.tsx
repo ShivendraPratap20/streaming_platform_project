@@ -2,25 +2,37 @@ import { Pencil } from "lucide-react";
 import { type LucideIcon, Video, Music, } from "lucide-react";
 import type { User } from "../../utils/interfaces";
 import { useModalContext } from "../../context/ModalContext";
+import ProfilePicture from "../ProfilePicture";
 
 const ProfileCard = (props: User): React.JSX.Element => {
-    const { openModal, setModalData }: { openModal: (param:string) => void } = useModalContext();
+    const { openModal, setModalData }: { openModal: (param: string) => void } = useModalContext();
 
     return (
-        <div className="profile_container_background rounded-2xl bg-blue-200">
-            <div className="profile_container_surface flex flex-col gap-4 md:flex-row justify-between items-center p-4">
+        <div className="profile_container_background rounded-2xl relative overflow-hidden">
+            <div
+                className="absolute inset-0 bg-cover bg-center"
+                style={{
+                    backgroundImage: "url('/thumbnail.png')"
+                }}
+            />
+            <div className="profile_container_surface flex flex-col gap-4 md:flex-row justify-between items-center p-4 relative z-10 bg-gradient-to-r from-black/80 via-black/40 to-transparent">
                 <div className="profile flex flex-row items-start gap-4 md:w-1/2">
-                    <img
-                        src="/profile.png"
-                        alt={props.userName || "Profile"}
-                        width={100}
-                        height={100}
-                        className="rounded-full"
+                    <ProfilePicture
+                        userName={props.userName}
+                        imageSrc={props.profilePicture}
+                        onImageChange={()=>{}}
                     />
                     <div>
-                        <h1>{props.userName || ""}</h1>
-                        <h4>{props.userID || ""}</h4>
-                        <p>{props.aboutUserInfo || ""}</p>
+                        <h1 className="text-text_primary text-4xl">{props.userName || ""}</h1>
+                        <h4 className="text-text_label text-lg">{props.userID || ""}</h4>
+                        <span className="flex flex-row items-center gap-2 text-text_label">
+                            {
+                                props.profileTag?.map((val: string, idx: number) =>
+                                    <p key={`${val}_${idx}`}>{val}</p>
+                                )
+                            }
+                        </span>
+                        <p className="text-text_label">{props.aboutUserInfo || ""}</p>
                     </div>
                 </div>
                 <div className="profile_button">
@@ -63,23 +75,23 @@ const DashboardCard = ({ key, mediaName, mediaType, fileStatus, createdAt }: any
         UPLOADING: {
             bgColor: "bg-uploading-bg",
             textColor: "text-uploading-text",
-        }, 
+        },
         UPLOADED: {
             bgColor: "bg-uploaded-bg",
             textColor: "text-uploaded-text",
-        }, 
+        },
         QUEUED: {
             bgColor: "bg-queued-bg",
             textColor: "text-queued-text",
-        }, 
+        },
         PROCESSING: {
             bgColor: "bg-processing-bg",
             textColor: "text-processing-text",
-        }, 
+        },
         READY: {
             bgColor: "bg-ready-bg",
             textColor: "text-ready-text",
-        }, 
+        },
         FAILED: {
             bgColor: "bg-failed-bg",
             textColor: "text-failed-text",
@@ -87,7 +99,7 @@ const DashboardCard = ({ key, mediaName, mediaType, fileStatus, createdAt }: any
     };
 
     return (
-        <div key={key} className="flex flex-row gap-5 justify-between items-center">
+        <div key={key} className="flex flex-row gap-5 justify-between items-center p-4 rounded-2xl hover:bg-container">
 
             <div className="flex flex-row gap-2 w-[50%] items-center">
                 <img src="/public/profile.png" alt="" width={60} height={60} className="rounded-xl" />
@@ -96,7 +108,7 @@ const DashboardCard = ({ key, mediaName, mediaType, fileStatus, createdAt }: any
 
             <div className="flex flex-row gap-2">
                 {
-                    mediaType == "video" ? <Video size={30} color="var(--color-text_label)"/> : <Music size={30} color="var(--color-text_label)"/>
+                    mediaType == "video" ? <Video size={30} color="var(--color-text_label)" /> : <Music size={30} color="var(--color-text_label)" />
                 }
                 <p className="text-lg text-text_label">{mediaType}</p>
             </div>
@@ -115,7 +127,7 @@ const Dashboard = ({ mediaFilesArray }: any) => {
     return (
         <>
             <h1 className="text-2xl text-text_primary">Your Uploaded media</h1>
-            <div className="container flex flex-col gap-4 overflow-x-auto h-100">
+            <div className="container flex flex-col overflow-x-auto h-100">
                 {
                     mediaFilesArray.map((val: any, idx: number) => {
                         return <DashboardCard key={idx} {...val} />

@@ -1,5 +1,5 @@
 
-import { z } from 'zod';
+import { nullable, z } from 'zod';
 
 const userSignupSchema = z.object({
   userName: z
@@ -62,6 +62,11 @@ const userUpdateSchema = z.object({
     .max(30, 'User name must be at most 30 characters long')
     .optional(),
 
+  userID: z
+    .string()
+    .trim()
+    .min(1, 'User ID is required'),
+
   email: z
     .string()
     .trim()
@@ -80,6 +85,7 @@ const userUpdateSchema = z.object({
   phoneNumber: z
     .string()
     .regex(/^\d{10}$/, 'Phone number must be a 10-digit number')
+    .nullable()
     .optional(),
 
   profilePicture: z
@@ -90,10 +96,10 @@ const userUpdateSchema = z.object({
     .optional(),
 
   aboutUserInfo: z
-  .string()
-  .trim()
-  .min(30, 'User name must be at least 30 characters long')
-  .max(200, 'User name must be at most 200 characters long'),
+    .string()
+    .trim()
+    .max(200, 'About name must be at most 200 characters long')
+    .optional(),
 }).strict();
 
 export type UserSignupInput = z.infer<typeof userSignupSchema>;

@@ -22,7 +22,8 @@ const congifMUlter = (uploadDir: string) => {
     const fileFilter = (req: Request, file: any, cb:any) => {
         if (
             file.mimetype.startsWith("video/") ||
-            file.mimetype.startsWith("audio/")
+            file.mimetype.startsWith("audio/") ||
+            file.mimetype.startsWith("image/")
         ) {
             return cb(null, true);
         }

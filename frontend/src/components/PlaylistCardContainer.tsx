@@ -8,7 +8,11 @@ import { useModalContext } from "../context/ModalContext";
 
 const PlaylistCard = (Media: PlaylistCardData): React.JSX.Element => {
     let { _id, playlistName, playlistItems, totalDuration } = Media;
-    const { openModal } = useModalContext();
+    const { openModal, closeModal, setModalData }: {
+        openModal: (param:string) => void,
+        closeModal: () => void,
+        setModalData: (data: any) => void,
+    } = useModalContext();
 
     const formattedDuration:string = mediaDurationFormat(totalDuration);
     return (
@@ -25,6 +29,7 @@ const PlaylistCard = (Media: PlaylistCardData): React.JSX.Element => {
       "
             onClick={() => {
                openModal('playlist');
+               setModalData({ playlistName, playlistItems });
             }}
         >
             <div className="relative w-full flex-1 min-h-0">

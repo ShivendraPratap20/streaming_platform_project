@@ -92,7 +92,7 @@ interface User {
   email: string;
 
   phoneNumber?: number;
-  profilePicture: string | null;
+  profilePicture: string | undefined;
 
   accountType: AccountType;
   authorizationType: AuthorizationType;
@@ -108,6 +108,7 @@ interface User {
   }[];
 
   aboutUserInfo?: string;
+  profileTag?: string[];
 
   playlist: {
     _id?: string;

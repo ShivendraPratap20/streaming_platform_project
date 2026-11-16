@@ -52,13 +52,12 @@ const ProfileUpdateValidation = Yup.object({
     .required("Name is required"),
 
   userID: Yup.string()
-    .email("Invalid email")
-    .required("Enter valid email address"),
+    .required("UserID required"),
 
   phoneNumber: Yup.string()
     .min(10, "Phone Number must be of 10 digits")
     .matches(/^[0-9]{10}$/, "Phone number must be 10 digits")
-    .required("Phone number is required"),
+    .optional(),
 
   email: Yup
     .string()
@@ -88,7 +87,8 @@ const ProfileUpdateValidation = Yup.object({
     .string()
     .trim()
     .min(30, 'User name must be at least 30 characters long')
-    .max(200, 'User name must be at most 200 characters long'),
+    .max(200, 'User name must be at most 200 characters long')
+    .optional(),
 });
 
 // Infer TypeScript types from Yup schemas

@@ -1,16 +1,30 @@
+import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { queryClient } from "../../App";
+import { useFormik } from "formik";
+import { User, Mail, Phone, Lock, ShieldCheck, PencilLine } from "lucide-react";
 import api from "../../api/axios";
 import { ProfileUpdateValidation, type ProfileUpdateFormData } from "../../schemas/ValidationSchema";
-import { useFormik } from "formik";
-import { User, Mail, Phone, Lock, ShieldCheck } from "lucide-react";
+import ProfilePicture from "../ProfilePicture";
 
-
-const UpdateModal = ({ isOpen, onClose, data }: { isOpen: boolean; onClose: () => void, data:any }): React.JSX.Element | null => {
+const UpdateModal = ({ isOpen, onClose, data }: { isOpen: boolean; onClose: () => void, data: any }): React.JSX.Element | null => {
     if (!isOpen) return null;
 
+    const [profileImage, setProfileImage] = useState<File | null>(null);
+
+    const handleProfileImageChange = (file: File) => {
+        setProfileImage(file);
+    };
+
     const handleUpdate = async (values: ProfileUpdateFormData) => {
-        const response = await api.put("/user/modify", { updatingData: values });
+        const formData = new FormData();
+        formData.append("updatingData", JSON.stringify(values));
+
+        if (profileImage) {
+            formData.append("profilePic", profileImage);
+        }
+
+        const response = await api.put("/user/modify", formData);
         return response;
     };
 
@@ -18,6 +32,7 @@ const UpdateModal = ({ isOpen, onClose, data }: { isOpen: boolean; onClose: () =
         mutationFn: handleUpdate,
         onSuccess: (data) => {
             queryClient.setQueryData(["me"], data);
+            console.log(data)
             onClose();
         },
     });
@@ -27,9 +42,8 @@ const UpdateModal = ({ isOpen, onClose, data }: { isOpen: boolean; onClose: () =
             userName: data.userName,
             userID: data.userID,
             email: data.email,
-            aboutUserInfo: "",
-            phoneNumber: data?.phoneNumber || "",
-            password: ""
+            ...(data.phoneNumber && { phoneNumber: data?.phoneNumber.toString() }),
+            ...(data.aboutUserInfo && { aboutUserInfo: data?.aboutUserInfo }),
         },
         validationSchema: ProfileUpdateValidation,
         onSubmit: mutate
@@ -48,7 +62,13 @@ const UpdateModal = ({ isOpen, onClose, data }: { isOpen: boolean; onClose: () =
                 onClick={(e) => e.stopPropagation()}
             >
                 <h1 className="text-text_primary text-lg md:text-xl lg:text-3xl text-center p-4">Update Profile</h1>
+                <ProfilePicture
+                    userName={values.userName}
+                    imageSrc={data.profilePicture}
+                    onImageChange={handleProfileImageChange}
+                />
                 <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
+
                     {/* Form Fields */}
                     {[
                         {
@@ -60,8 +80,15 @@ const UpdateModal = ({ isOpen, onClose, data }: { isOpen: boolean; onClose: () =
                         },
                         {
                             name: "userID",
-                            label: "Email Address",
+                            label: "User ID",
                             placeholder: data.userID,
+                            type: "text",
+                            icon: <Mail size={20} />,
+                        },
+                        {
+                            name: "email",
+                            label: "Email",
+                            placeholder: data.email,
                             type: "email",
                             icon: <Mail size={20} />,
                         },
@@ -73,18 +100,11 @@ const UpdateModal = ({ isOpen, onClose, data }: { isOpen: boolean; onClose: () =
                             icon: <Phone size={20} />,
                         },
                         {
-                            name: "password",
-                            label: "Password",
-                            placeholder:  "********",
-                            type: "password",
-                            icon: <Lock size={20} />,
-                        },
-                        {
-                            name: "confirmPassword",
-                            label: "Re-enter your password",
-                            placeholder:  "********",
-                            type: "password",
-                            icon: <ShieldCheck size={20} />,
+                            name: "aboutUserInfo",
+                            label: "Something about you",
+                            placeholder: data?.aboutUserInfo || "Start writing here!",
+                            type: "textarea",
+                            icon: <PencilLine size={20} />,
                         },
                     ].map((field) => {
                         const hasError = Boolean(
@@ -155,7 +175,7 @@ const UpdateModal = ({ isOpen, onClose, data }: { isOpen: boolean; onClose: () =
       active:scale-[0.98]
       disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                        {isPending ? "Creating Account..." : "Update Account"}
+                        {isPending ? "Updating Account..." : "Update Account"}
                     </button>
                     {
                         isError &&

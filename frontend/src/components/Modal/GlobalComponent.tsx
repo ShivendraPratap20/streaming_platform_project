@@ -13,7 +13,7 @@ const GlobalModal = ({ modalState, onClose, modalData }: { modalState: ModalStat
         case 'upload':
             return <UploadModal isOpen={true} onClose={onClose}/>
         case 'playlist':
-            return <PlaylistModal isOpen={true} onClose={onClose}/>
+            return <PlaylistModal isOpen={true} onClose={onClose} data={modalData}/>
         case 'update':
             return <UpdateModal isOpen={true} onClose={onClose} data={modalData}/>
         default:

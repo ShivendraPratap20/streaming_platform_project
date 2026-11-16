@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { OAuth2Client, TokenPayload } from 'google-auth-library';
 import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
+import { cloudinary } from '../config/cloudinary.js';
 import { userSignupSchema, userLoginSchema, userUpdateSchema } from '../validators/user.validation.js';
 import userModel from '../model/database/user.model.js';
 import { AppError } from '../utils/AppError.js'
@@ -221,6 +222,7 @@ const userLogin = async (req: Request, res: Response) => {
 const userModify = async (req: Request, res: Response) => {
     const userID = req.authenticatedUserData?.userID;
     let { updatingData } = req.body;
+    updatingData = JSON.parse(updatingData);
 
     updatingData = await userUpdateSchema.parseAsync(updatingData);
 
@@ -230,7 +232,18 @@ const userModify = async (req: Request, res: Response) => {
     if (!userID)
         throw new AppError('User ID is required for update', 400);
 
-    const updateUserData = await userModel.findOneAndUpdate({ userID }, { $set: updatingData }, { new: true });
+    let cloudUploadResult;
+    if (req.file) {
+        cloudUploadResult = await cloudinary.uploader.upload(
+            req.file.path,
+            {
+                resource_type: 'image',
+                folder: `streaming-app/profilePicture`,
+            }
+        );
+    }
+
+    const updateUserData = await userModel.findOneAndUpdate({ userID }, { $set: { ...updatingData, ...{ profilePicture: cloudUploadResult?.url || null}} }, { new: true });
 
     if (!updateUserData)
         throw new AppError('Updation Failed', 404, true, { userID: 'User with the provided ID does not exist' });
@@ -398,7 +411,7 @@ const getFavorites = async (req: Request, res: Response) => {
     if (!_id || !userID || !userName) return res.status(401).json({});
 
     const userData = await userModel.findOne({ _id, userID, userName });
-    const { favorites }:any = userData;
+    const { favorites }: any = userData;
 
     if (!userData)
         throw new AppError('No user found', 404);
@@ -413,14 +426,36 @@ const getMyPlaylist = async (req: Request, res: Response) => {
     if (!_id || !userID || !userName) return res.status(401).json({});
 
     const userData = await userModel.findOne({ _id, userID, userName });
-    const { playlist }:any = userData;
 
     if (!userData)
         throw new AppError('No user found', 404);
 
+    const { playlist }: any = userData;
 
     res.status(200).json({ status: true, data: playlist });
-}
+};
+
+const getMyPlaylistItems = async (req: Request, res: Response) => {
+    const { _id, userID, userName } = req.authenticatedUserData;
+    let playlistName = req.params.playlistName;
+
+    if (!_id || !userID || !userName) return res.status(401).json({});
+
+    const playlistData = await userModel.findOne({ _id, userID, userName, "playlist.playlistName": playlistName }, {
+        _id: 0,
+        playlist: {
+            $elemMatch: { "playlistName": playlistName }
+        }
+    });
+
+    if (!playlistData)
+        throw new AppError('No user found', 404);
+
+    let playlistItemsIDArray = playlistData.playlist[0].playlistItems;
+    const playlistItems = await mediaModel.find({ _id: { $in: [...playlistItemsIDArray] } });
+
+    res.status(200).json({ status: true, data: playlistItems });
+};
 
 const profilePageData = async (req: Request, res: Response) => {
     const { authenticatedUserData } = req;
@@ -464,4 +499,5 @@ export {
     getFavorites,
     profilePageData,
     getMyPlaylist,
+    getMyPlaylistItems,
 };
