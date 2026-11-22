@@ -5,7 +5,7 @@ import { ProfileBadge } from "./PageComponent/HomePageComp";
 
 const TabComponent = (): React.JSX.Element => {
     return (
-        <aside className="side-tab-container bg-new_tab fixed bottom-0 left-0 right-0 lg:static lg:h-100vh lg:w-[15vw] lg:flex flex-col justify-between lg:px-4 lg:py-4 col-span-1 row-span-3 z-10">
+        <aside className="side-tab-container bg-surface_1 fixed bottom-0 left-0 right-0 lg:static lg:h-100vh lg:w-[15vw] lg:flex flex-col justify-between lg:px-4 lg:py-4 col-span-1 row-span-3 z-10">
             <div className="flex flex-col gap-4">
                 <div className="logo-container hidden lg:flex flex-row gap-x-4 justify-center items-center ">
                     <div className="logo-icon">

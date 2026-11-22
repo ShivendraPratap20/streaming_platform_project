@@ -1,11 +1,12 @@
 
-import React from "react";
+import React, { type JSX } from "react";
 import { type MediaDataType } from "../utils/interfaces";
 import { useNavigate } from "react-router";
+import { UserRound, Video, EighthNote } from "lucide-react";
 import { mediaDurationFormat } from "../utils";
 
 const MediaCard = (Media: MediaDataType): React.JSX.Element => {
-    let { _id, mediaDetails: { duration }, mediaName, mediaType } = Media;
+    let { _id, mediaDetails: { duration }, mediaName, mediaType, artist: { artistUserID } } = Media;
     const navigate = useNavigate();
     const formattedDuration:string = mediaDurationFormat(duration);
     return (
@@ -18,7 +19,6 @@ const MediaCard = (Media: MediaDataType): React.JSX.Element => {
         overflow-hidden
         rounded-lg
         bg-container
-        cursor-pointer
       "
             onClick={() => {
                 navigate(`/player/${_id}`, {
@@ -50,14 +50,21 @@ const MediaCard = (Media: MediaDataType): React.JSX.Element => {
                 </span>
             </div>
 
-            <div className="h-[70px] sm:h-[75px] lg:h-[80px] p-2 flex flex-col gap-1 overflow-hidden">
-                <h3 className="text-xs sm:text-sm font-semibold text-text_primary line-clamp-1">
+            <div className=" p-2 flex flex-col gap-1 overflow-hidden">
+                <h3 className="text-xs sm:text-sm font-semibold text-text_primary">
                     {mediaName}
                 </h3>
-
-                <p className="text-[10px] sm:text-xs text-text_label line-clamp-2">
-                    {mediaType}
-                </p>
+                 <p className="text-[10px] sm:text-xs text-text_label line-clamp-2">
+                        {artistUserID}
+                    </p>
+                <div className="flex flex-row gap-2 items-center">
+                    {
+                        mediaType == "video" ? <Video color="var(--color-text_label)"/> : <EighthNote color="var(--color-text_label)"/>
+                    }
+                    <p className="text-[10px] sm:text-xs text-text_label line-clamp-2">
+                        {mediaType}
+                    </p>
+                </div>
             </div>
         </div>
     );

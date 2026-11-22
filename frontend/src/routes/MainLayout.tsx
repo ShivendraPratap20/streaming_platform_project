@@ -6,21 +6,24 @@ const MainLayout = () => {
 
   return (
     <div className="
-    flex
-    flex-row
-    gap-8
+    lg:grid 
+    lg:grid-cols-[15vw_2fr_0.5fr] 
+    lg:grid-rows-[0.5fr_2fr_1fr] 
+    gap-x-4
+    gap-y-4
+
+    flex flex-col
 
     h-screen w-screen 
     overflow-hidden
+    p-2
     ">
 
       <TabComponent />
 
-      <div className="bg-new_pg_bg flex-1 p-4 rounded-2xl my-6 overflow-y-auto h-[100%] scrollbar-thin scrollbar-thumb-container">
-        <Header />
-        <Outlet/>
+      <Header />
+      <main className="lg:col-span-2 lg:col-start-2 lg:col-end-4 lg:row-span-2 overflow-y-auto h-[100%] scrollbar-thin scrollbar-thumb-container scrollbar-track-surface_2"><Outlet /></main>
       
-      </div>
     </div>
   );
 };
