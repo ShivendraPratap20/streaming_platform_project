@@ -1,11 +1,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
-import PlaybackControls from "./VideoPlayer/PlaybackControls/PlaybackControls";
-import { type TimeRange, type QualityLevel } from "../utils/interfaces/index";
-import { updateBufferedRanges } from "../utils/index";
-import ProgressBar from "./VideoPlayer/ProgressBar/ProgressBar";
-import QualitySelector from "./VideoPlayer/PlaybackControls/QualitySelector";
+import { Expand, Shrink } from "lucide-react";
+import { type TimeRange, type QualityLevel } from "../../utils/interfaces/index";
+import { updateBufferedRanges } from "../../utils/index";
+import PlaybackControls from "./PlaybackControls";
+import ProgressBar from "./ProgressBar";
+import QualitySelector from "./QualitySelector";
 
 interface VideoPlayerProps {
     src: string;
@@ -13,25 +14,30 @@ interface VideoPlayerProps {
     autoPlay?: boolean;
     loop?: boolean;
     muted?: boolean;
+    isFullScreen?: boolean;
 
     onPlay?: () => void;
     onPause?: () => void;
     onTimeUpdate?: (currentTime: number) => void;
     onDurationChange?: (duration: number) => void;
+    handleFullScreen?: () => void;
     onError?: (message: string) => void;
 }
 
 const VideoPlayer = ({
     src,
     poster,
-    autoPlay = false,
+    autoPlay = true,
     loop = false,
     muted = false,
+    isFullScreen,
+    handleFullScreen,
     onError,
 }: VideoPlayerProps) => {
 
     const videoRef = useRef<HTMLVideoElement>(null);
     const hlsRef = useRef<Hls | null>(null);
+    const videoWrapperRef = useRef<HTMLElement>(null);
 
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
@@ -61,7 +67,7 @@ const VideoPlayer = ({
         ) => {
             if (!active || !data.fatal) return;
 
-            if(data.response.code == 404){
+            if (data.response.code == 404) {
                 setError('Media file not found or removed');
                 hlsRef.current?.destroy();
                 hlsRef.current = null;
@@ -141,39 +147,8 @@ const VideoPlayer = ({
 
     }, [src, autoPlay]);
 
-    const handleTogglePlayback = async () => {
-        const video = videoRef.current;
 
-        if (!video) return;
 
-        if (video.paused) {
-            try {
-                await video.play();
-            } catch (error) {
-                console.error("Playback failed:", error);
-            }
-        } else {
-            video.pause();
-        }
-    };
-
-    const handleSeek = (time: number) => {
-        const video = videoRef.current;
-
-        if (!video) return;
-
-        video.currentTime = time;
-    };
-
-    const handleQualityChange = (level: number) => {
-        const hls = hlsRef.current;
-
-        if (!hls) return;
-
-        hls.currentLevel = level;
-
-        setSelectedQuality(level);
-    };
 
     const handleVideoError = () => {
         const video = videoRef.current;
@@ -262,14 +237,25 @@ const VideoPlayer = ({
                             isPlaying={isPlaying}
                             currentTime={currentTime}
                             duration={duration}
-                            onTogglePlayBack={handleTogglePlayback}
+                            mediaElement={videoRef.current}
                         />
 
-                        <QualitySelector
-                            levels={qualityLevels}
-                            selectedLevel={selectedQuality}
-                            onSelect={handleQualityChange}
-                        />
+                        <div className="flex flex-row items-center">
+                            <div className="px-3 py-2 hover:bg-white/10 rounded-md transition"
+                                onClick={handleFullScreen}
+                            >
+                                {
+                                    isFullScreen? <Shrink color="var(--color-text_label)" /> : <Expand color="var(--color-text_label)" />
+                                }
+                            </div>
+                            <QualitySelector
+                                levels={qualityLevels}
+                                selectedLevel={selectedQuality}
+                                setSelectedQuality={setSelectedQuality}
+                                HlsElement={hlsRef.current}
+                            />
+                        </div>
+
                     </div>
                     {/* Progress Bar */}
                     <div className="w-full">
@@ -277,7 +263,8 @@ const VideoPlayer = ({
                             currentTime={currentTime}
                             duration={duration}
                             bufferedRanges={bufferedRanges}
-                            onSeek={handleSeek}
+                            MediaElement={videoRef.current}
+                            onSeek={() => { }}
                         />
                     </div>
                 </div>

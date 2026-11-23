@@ -1,28 +1,60 @@
-import React from "react"
+import React, { useState, useEffect, useRef } from "react"
 import { useLocation } from "react-router";
 import { MonitorPlay, EighthNote, Plus, Heart } from "lucide-react";
 import { type MediaDataType } from "../utils/interfaces";
 import { mediaDurationFormat } from "../utils";
-import VideoPlayer from "../components/VideoPlayer";
-import AudioPlayer from "../components/AudioPlayerComponent";
+import VideoPlayer from "../components/PlayerComponent/VideoPlayer";
+import AudioPlayer from "../components/PlayerComponent/AudioPlayer";
 import Button from "../components/Button";
 
 export default function VideoPlayerPage(): React.JSX.Element {
     let { state } = useLocation();
+    const playerWrapperRef = useRef<HTMLDivElement>(null);
+    const [isFullScreen, setIsFullScreen] = useState(false);
     const { _id, mediaName, mediaType, hlsURL, createdAt, mediaDetails: { duration }, artist: { artistName }, aboutMediaInfo }: MediaDataType = state.Media;
+
+    useEffect(() => {
+        const handleFullscreenChange = () => {
+            setIsFullScreen(document.fullscreenElement === playerWrapperRef.current);
+        };
+
+        document.addEventListener("fullscreenchange", handleFullscreenChange);
+
+        return () => {
+            document.removeEventListener("fullscreenchange", handleFullscreenChange);
+        };
+    }, []);
+
+    const handleFullScreen = async () => {
+
+        const element = playerWrapperRef.current;
+        if (!element) return;
+
+        try {
+            if (!document.fullscreenElement) {
+                await element.requestFullscreen();
+            } else {
+                await document.exitFullscreen();
+            }
+        } catch (error) {
+            console.error("Fullscreen error:", error);
+        }
+    };
 
     if (!state.Media)
         return <h1>Loading....</h1>
 
     return (
         <div className="lg:grid lg:grid-cols-[2fr_1fr] lg:grid-rows-[1fr_1fr] gap-4">
-            {
-                mediaType == "video" ? (
-                    <VideoPlayer src={hlsURL + '/master.m3u8' || ''} />
-                ) : (
-                    <AudioPlayer src={hlsURL + '/master.m3u8' || ''} />
-                )
-            }
+            <div ref={playerWrapperRef}>
+                {
+                    mediaType == "video" ? (
+                        <VideoPlayer src={hlsURL + '/master.m3u8' || ''} handleFullScreen={handleFullScreen} isFullScreen={isFullScreen} />
+                    ) : (
+                        <AudioPlayer src={hlsURL + '/master.m3u8' || ''} handleFullScreen={handleFullScreen} isFullScreen={isFullScreen}/>
+                    )
+                }
+            </div>
 
             <section className="flex flex-col gap-4 lg:row-start-2 ">
                 <section className="media_info_section flex flex-col gap-3">
@@ -41,8 +73,8 @@ export default function VideoPlayerPage(): React.JSX.Element {
                     </div>
                     <p className="text-lg text-text_label">{aboutMediaInfo}</p>
                     <div className="flex flex-row justify-start items-center gap-4">
-                        <Button icon={Plus} Title={'Add to Playlist'} mediaID={_id} buttonTag="FavBtn"/>
-                        <Button icon={Heart} Title={'Add to Favorite'}  mediaID={_id} buttonTag="PlyLstBtn"/>
+                        <Button icon={Plus} Title={'Add to Playlist'} mediaID={_id} buttonTag="FavBtn" />
+                        <Button icon={Heart} Title={'Add to Favorite'} mediaID={_id} buttonTag="PlyLstBtn" />
 
                     </div>
                 </section>

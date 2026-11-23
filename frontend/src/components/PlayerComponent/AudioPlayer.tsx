@@ -1,12 +1,20 @@
 import Hls from "hls.js";
 import { useEffect, useRef, useState } from "react";
+import { Shrink, Expand } from "lucide-react";
 import PlaybackControls from "./PlaybackControls";
 import QualitySelector from "./QualitySelector";
 import { updateBufferedRanges } from "../../utils";
 import { type QualityLevel, type TimeRange } from "../../utils/interfaces";
 import ProgressBar from "./ProgressBar";
 
-const AudioPlayer = ({ src }: { src: string }): React.JSX.Element => {
+interface PropsType {
+    src: string;
+    isFullScreen: boolean;
+
+    handleFullScreen: () => void;
+};
+
+const AudioPlayer = ({ src, isFullScreen, handleFullScreen }: PropsType): React.JSX.Element => {
 
     const audioRef = useRef<HTMLAudioElement>(null);
     const hslRef = useRef<Hls | null>(null);
@@ -80,6 +88,12 @@ const AudioPlayer = ({ src }: { src: string }): React.JSX.Element => {
                 bg-black
                 group
             `}>
+            <div
+                className="absolute inset-0 bg-cover bg-center"
+                style={{
+                    backgroundImage: "url('/public/streamvibe-banner.png')",
+                }}
+            />
             <audio
                 ref={audioRef}
                 onPlay={() => setIsPlaying(true)}
@@ -128,12 +142,21 @@ const AudioPlayer = ({ src }: { src: string }): React.JSX.Element => {
                             duration={duration}
                         />
 
-                        <QualitySelector
-                            levels={qualityLevels}
-                            selectedLevel={selectedQuality}
-                            setSelectedQuality={selectedQuality}
-                            HlsElement={hslRef.current}
-                        />
+                        <div className="flex flex-row items-center">
+                            <div className="px-3 py-2 hover:bg-white/10 rounded-md transition"
+                                onClick={handleFullScreen}
+                            >
+                                {
+                                    isFullScreen ? <Shrink color="var(--color-text_label)" /> : <Expand color="var(--color-text_label)" />
+                                }
+                            </div>
+                            <QualitySelector
+                                levels={qualityLevels}
+                                selectedLevel={selectedQuality}
+                                setSelectedQuality={setSelectedQuality}
+                                HlsElement={hslRef.current}
+                            />
+                        </div>
                     </div>
                     {/* Progress Bar */}
                     <div className="w-full">
@@ -142,7 +165,7 @@ const AudioPlayer = ({ src }: { src: string }): React.JSX.Element => {
                             currentTime={currentTime}
                             duration={duration}
                             bufferedRanges={bufferedRanges}
-                            onSeek={()=>{}}
+                            onSeek={() => { }}
                         />
                     </div>
                 </div>

@@ -30,13 +30,13 @@ const QualitySelector = ({
     const handleSelect = (level: number) => {
         if(!HlsElement)
             return
-        
+        console.log(HlsElement)
         handleQualityChange(level, HlsElement, setSelectedQuality);
         setIsOpen(false);
     };
 
     return (
-        <div className="relative">
+        <div className="relative ">
 
             {/* Settings button */}
             <button
@@ -59,7 +59,6 @@ const QualitySelector = ({
                     <div className="px-3 py-2 text-xs text-gray-400 border-b border-gray-700">
                         Video Quality
                     </div>
-
                     {/* Auto option */}
                     <button
                         type="button"

@@ -18,7 +18,7 @@ const Button = ({ icon: Icon, Title, mediaID, buttonTag }: PropsType): React.JSX
         mutationKey: ['addFav'],
     });
     const { isLoading, data, isAuthenticated } = useAuth();
-    const { openModal } = useModalContext();
+    const { openModal }: { openModal: (param: string) => void} = useModalContext();
 
 
     const clickHandler = useCallback(()=>{
