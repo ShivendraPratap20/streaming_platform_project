@@ -243,7 +243,7 @@ const userModify = async (req: Request, res: Response) => {
         );
     }
 
-    const updateUserData = await userModel.findOneAndUpdate({ userID }, { $set: { ...updatingData, ...{ profilePicture: cloudUploadResult?.url || null}} }, { new: true });
+    const updateUserData = await userModel.findOneAndUpdate({ userID }, { $set: { ...updatingData, ...{ profilePicture: cloudUploadResult?.url || null } } }, { new: true });
 
     if (!updateUserData)
         throw new AppError('Updation Failed', 404, true, { userID: 'User with the provided ID does not exist' });
@@ -483,6 +483,49 @@ const profilePageData = async (req: Request, res: Response) => {
     res.status(200).json({ status: true, data: userData });
 };
 
+const getArtistProfile = async (req: Request, res: Response) => {
+    const { artistName, artistUserID, artistObjectID } = req.query;
+
+    if (!artistName || !artistUserID || !artistObjectID)
+        throw new AppError('Bad request', 401);
+
+    const artistData = await userModel.findOne({ _id: new mongoose.Types.ObjectId(artistObjectID?.toString()), userName: artistName, userID: artistUserID }, {
+        userName: 1,
+        userID: 1,
+        profilePicture: 1,
+        profileTag: 1,
+        aboutUserInfo: 1,
+        mediaFiles: 1
+    });
+
+    if (!artistData)
+        throw new AppError('Not found', 404);
+
+    let { videoFiles, audioFiles } = artistData.mediaFiles;
+
+    const [videoData, audioData] = await Promise.all([
+        mediaModel.find({
+            _id: { $in: videoFiles }
+        }),
+        mediaModel.find({
+            _id: { $in: audioFiles }
+        })
+    ]);
+
+    const mediaData = {
+        videoData,
+        audioData
+    };
+
+    res.status(200).json({
+        status: true,
+        data: {
+            ...artistData.toObject(),
+            mediaData
+        }
+    })
+};
+
 export {
     getMe,
     registerUser,
@@ -500,4 +543,5 @@ export {
     profilePageData,
     getMyPlaylist,
     getMyPlaylistItems,
+    getArtistProfile,
 };

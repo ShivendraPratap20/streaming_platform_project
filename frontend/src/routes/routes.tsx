@@ -5,6 +5,7 @@ import VideoPlayerPage from '../pages/VideoPlayer';
 import { MoviesTab, MusicTab, UploadsTab, FavoritesTab } from '../components/PageComponent/HomePageComp';
 import ProtectedRoute from './ProtectedRoute';
 import ProfilePage from '../pages/Profile';
+import ArtistProfile from '../pages/ArtistProfile';
 
 const router = createBrowserRouter([
   {
@@ -43,6 +44,10 @@ const router = createBrowserRouter([
         path: "/profile",
         element: <ProfilePage/>
       },
+      {
+        path:"/artist/:artistName",
+        element:<ArtistProfile/>
+      }
     ]
   },
 ]);

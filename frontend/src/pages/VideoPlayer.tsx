@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react"
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { MonitorPlay, EighthNote, Plus, Heart } from "lucide-react";
 import { type MediaDataType } from "../utils/interfaces";
 import { mediaDurationFormat } from "../utils";
@@ -11,8 +11,8 @@ export default function VideoPlayerPage(): React.JSX.Element {
     let { state } = useLocation();
     const playerWrapperRef = useRef<HTMLDivElement>(null);
     const [isFullScreen, setIsFullScreen] = useState(false);
-    const { _id, mediaName, mediaType, hlsURL, createdAt, mediaDetails: { duration }, artist: { artistName }, aboutMediaInfo }: MediaDataType = state.Media;
-
+    const { _id, mediaName, mediaType, hlsURL, createdAt, mediaDetails: { duration }, artist: { artistName, artistObjectID, artistUserID }, aboutMediaInfo }: MediaDataType = state.Media;
+    const navigate = useNavigate();
     useEffect(() => {
         const handleFullscreenChange = () => {
             setIsFullScreen(document.fullscreenElement === playerWrapperRef.current);
@@ -51,7 +51,7 @@ export default function VideoPlayerPage(): React.JSX.Element {
                     mediaType == "video" ? (
                         <VideoPlayer src={hlsURL + '/master.m3u8' || ''} handleFullScreen={handleFullScreen} isFullScreen={isFullScreen} />
                     ) : (
-                        <AudioPlayer src={hlsURL + '/master.m3u8' || ''} handleFullScreen={handleFullScreen} isFullScreen={isFullScreen}/>
+                        <AudioPlayer src={hlsURL + '/master.m3u8' || ''} handleFullScreen={handleFullScreen} isFullScreen={isFullScreen} />
                     )
                 }
             </div>
@@ -80,9 +80,24 @@ export default function VideoPlayerPage(): React.JSX.Element {
                 </section>
 
                 <section className="artist_info_section bg-dark_blue flex flex-row gap-x-5 items-start p-4 rounded-2xl">
-                    <img src="/profile.png" alt={`${artistName}'s profile`} width={70} height={70} className="rounded-full" />
+                    <img src="/profile.png" alt={`${artistName}'s profile`} width={70} height={70} className="rounded-full cursor-pointer"
+                        onClick={() => navigate(`/artist/${artistName}`, {
+                            state: {
+                                artistObjectID,
+                                artistName,
+                                artistUserID,
+                            }
+                        })}
+                    />
                     <div className="info flex flex-col gap-y-2">
-                        <div>
+                        <div className="cursor-pointer font-semibold"
+                            onClick={() => navigate(`/artist/${artistName}`, {
+                                state: {
+                                    artistObjectID,
+                                    artistName,
+                                    artistUserID,
+                                }
+                            })}>
                             <p className="text-text_primary text-xl">{artistName}</p>
                             <p className="text-text_label text-sm">Director Creator Writer</p>
                         </div>

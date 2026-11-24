@@ -1,5 +1,5 @@
 import express from 'express';
-import { registerUser, googleLoginHandler, googleCallbackHandler, userLogin, userModify, userDelete, userLogout, authSelf, tokenRefreshHandler, addFavorites, createPlaylist, getMe, getFavorites, profilePageData, getMyPlaylist, getMyPlaylistItems } from '../controller/user.controller.js';
+import { registerUser, googleLoginHandler, googleCallbackHandler, userLogin, userModify, userDelete, userLogout, authSelf, tokenRefreshHandler, addFavorites, createPlaylist, getMe, getFavorites, profilePageData, getMyPlaylist, getMyPlaylistItems, getArtistProfile } from '../controller/user.controller.js';
 import authMiddleware from '../middleware/auth.middleware.js';
 import upload from '../middleware/upload.middleware.js';
 
@@ -21,5 +21,6 @@ userRouter.get('/myFavorites', authMiddleware, getFavorites);
 userRouter.get('/myProfile', authMiddleware, profilePageData);
 userRouter.get('/myPlaylist', authMiddleware, getMyPlaylist);
 userRouter.get('/myPlaylistItems/:playlistName', authMiddleware, getMyPlaylistItems);
+userRouter.get('/artistData', getArtistProfile);
 
 export default userRouter;
